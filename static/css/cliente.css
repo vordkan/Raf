@@ -1,3 +1,11 @@
+.button-icon {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+
 /* Stile per il wrapper generale della pagina */
 .page-wrapper {
     max-width: 800px; /* Larghezza massima del riquadro */

@@ -121,7 +121,8 @@ def get_daily_schedule():
                 descrizione = prenotazione['descrizione']
                 cell_content += f'{cliente}<br><span style="font-size: 12px;">{descrizione}</span><br>'
                 cell_content += f'<span style="cursor: pointer;" onclick="eliminaPrenotazione({prenotazione_id}, \'{cliente}\', \'{descrizione}\')"> 🗑 </span>'
-                cell_content += f'<span style="cursor: pointer;" onclick="modificaPrenotazione({prenotazione_id})"> 📝 </span><br>'
+                cell_content += f'<span style="cursor: pointer;" onclick="modificaPrenotazione({prenotazione_id})"> 📝 </span>'
+                cell_content += f'<span style="cursor: pointer;" onclick="modificaPrenotazione_ora({prenotazione_id})"> 🕒 </span><br>'
             html_table += f'<td>{cell_content}</td>'
         html_table += '</tr>'
 
@@ -173,7 +174,9 @@ def get_daily_schedule_aversa():
                 descrizione = prenotazione['descrizione']
                 cell_content += f'{cliente}<br><span style="font-size: 12px;">{descrizione}</span><br>'
                 cell_content += f'<span style="cursor: pointer;" onclick="eliminaPrenotazione({prenotazione_id}, \'{cliente}\', \'{descrizione}\')"> 🗑 </span>'
-                cell_content += f'<span style="cursor: pointer;" onclick="modificaPrenotazione({prenotazione_id})"> 📝 </span><br>'
+                cell_content += f'<span style="cursor: pointer;" onclick="modificaPrenotazione({prenotazione_id})"> 📝 </span>'
+                cell_content += f'<span style="cursor: pointer;" onclick="modificaPrenotazione_ora({prenotazione_id})"> 🕒 </span><br>'
+
             html_table += f'<td>{cell_content}</td>'
         html_table += '</tr>'
 
@@ -201,6 +204,27 @@ def modifica_prenotazione():
             cursor.execute("UPDATE prenotazione SET prezzo = %s WHERE id = %s", (nuovo_prezzo_decimal, prenotazione_id))
         else:
             return jsonify({'error': 'Devi fornire una nuova descrizione o un nuovo prezzo per modificare la prenotazione.'}), 400
+
+        conn.commit()
+        print("Prenotazione modificata nel database 'raffaele'")
+        return jsonify({'message': 'Prenotazione modificata con successo nel database'}), 200
+    except Exception as e:
+        print(f"Si è verificato un errore durante la modifica della prenotazione nel database: {e}")
+        return jsonify({'error': 'Si è verificato un errore durante la modifica della prenotazione nel database.'}), 500
+
+@app.route('/modifica_prenotazione_ora', methods=['POST'])
+def modifica_prenotazione_ora():
+    data = request.json
+    prenotazione_id = data['prenotazione_id']
+    nuova_data_inizio = data.get('nuova_data_inizio')
+    nuova_data_fine = data.get('nuova_data_fine')
+
+    try:
+        # Controlla se sono presenti sia una nuova data di inizio che una nuova data di fine
+        if nuova_data_inizio is not None and nuova_data_fine is not None:
+            cursor.execute("UPDATE prenotazione SET data_inizio = %s, data_fine = %s WHERE id = %s", (nuova_data_inizio, nuova_data_fine, prenotazione_id))
+        else:
+            return jsonify({'error': 'Devi fornire sia una nuova data di inizio che una nuova data di fine per modificare la prenotazione.'}), 400
 
         conn.commit()
         print("Prenotazione modificata nel database 'raffaele'")
@@ -293,7 +317,7 @@ def storico_prenotazioni():
     cliente = request.form['cliente'].lower()
 
     try:
-        cursor.execute("SELECT dipendente, nome, descrizione, data_inizio, prezzo, sede FROM prenotazione WHERE nome = %s ORDER BY data_inizio DESC", (cliente,))
+        cursor.execute("SELECT dipendente, nome, descrizione, data_inizio, prezzo, sede, id FROM prenotazione WHERE nome = %s ORDER BY data_inizio DESC", (cliente,))
         storico_prenotazioni = cursor.fetchall()
         return render_template('cliente.html', storico_prenotazioni=storico_prenotazioni, cliente=cliente)
     except Exception as e:
