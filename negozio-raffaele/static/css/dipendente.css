@@ -1,0 +1,126 @@
+/* Stile per il wrapper generale della pagina */
+.page-wrapper {
+    max-width: 800px; /* Larghezza massima del riquadro */
+    margin: 50px auto; /* Centra il riquadro nella pagina e aggiunge spazio sopra */
+    padding: 20px; /* Aggiunge spazio intorno ai contenuti */
+    border: 2px solid #ccc; /* Aggiunge un bordo al riquadro */
+    border-radius: 10px; /* Aggiunge un bordo arrotondato */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Aggiunge un'ombra */
+    background-color: #fff; /* Colore di sfondo */
+}
+
+/* Stile generale per il corpo della pagina */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Stile per il titolo della pagina */
+h1 {
+    text-align: center;
+    color: #333; /* Colore del testo modificato */
+}
+
+/* Stile per i form */
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="datetime-local"],
+input[type="submit"],
+select { /* Aggiunto stile per i menu a tendina */
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+input[type="submit"] {
+    background-color: #4caf50;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+input[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+/* Stile per i messaggi di errore */
+.error-message {
+    color: red;
+    margin-bottom: 10px;
+}
+
+/* Stile per il calendario */
+.calendar {
+    margin-top: 50px;
+    text-align: center;
+    overflow-x: auto;
+}
+
+.calendar table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.calendar th,
+.calendar td {
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+.calendar th {
+    background-color: #f2f2f2;
+}
+
+/* Stile per i tab */
+.tabs {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.tab {
+    float: left;
+}
+
+.tab button {
+    background-color: #f2f2f2;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 10px 20px;
+    transition: background-color 0.3s;
+    border-radius: 5px 5px 0 0;
+}
+
+.tab button:hover {
+    background-color: #ddd;
+}
+
+.tabcontent {
+    display: none;
+    padding: 20px;
+    border-top: none;
+    clear: both;
+}
+
+.active {
+    background-color: #ddd;
+}

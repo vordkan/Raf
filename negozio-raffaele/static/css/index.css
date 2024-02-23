@@ -1,0 +1,55 @@
+/* Stile per il wrapper generale della pagina */
+.page-wrapper {
+    max-width: 800px; /* Larghezza massima del riquadro */
+    margin: 50px auto; /* Centra il riquadro nella pagina e aggiunge spazio sopra */
+    padding: 20px; /* Aggiunge spazio intorno ai contenuti */
+    border: 2px solid #ccc; /* Aggiunge un bordo al riquadro */
+    border-radius: 10px; /* Aggiunge un bordo arrotondato */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Aggiunge un'ombra */
+    background-color: #fff; /* Colore di sfondo */
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 600px;
+    margin: 50px auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.menu-button {
+    display: inline-block;
+    width: auto;
+    padding: 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #4caf50;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.menu-button:hover {
+    background-color: #45a049;
+}
