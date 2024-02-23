@@ -1,0 +1,18 @@
+CREATE TABLE prenotazione (
+    nome VARCHAR(20),
+    descrizione VARCHAR(255),
+    dipendente VARCHAR(20),
+    data_inizio DATETIME,
+    data_fine DATETIME,
+    prezzo DOUBLE,
+    sede VARCHAR(20),
+    id INT NOT NULL AUTO_INCREMENT,
+    PRIMARY KEY (id)
+);
+
+
+create table dipendente(
+    nome varchar(20),
+    sede varchar(20)
+)
+
