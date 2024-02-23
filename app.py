@@ -40,10 +40,21 @@ def index():
 def prenotazione():
     return render_template('prenotazione.html')
 
+# Cliente
+@app.route('/cliente')
+def cliente():
+    return render_template('cliente.html')
+
 # Dipendente
 @app.route('/dipendenti')
 def gestione_dipendenti():
     return render_template('dipendente.html')
+
+# Fatturato
+@app.route('/fatturato')
+def fatturato():
+    return render_template('fatturato.html')
+
 
 @app.route('/submit', methods=['POST'])
 def submit():
@@ -276,9 +287,6 @@ def elimina_dipendente():
         print(f"Si è verificato un errore durante l'eliminazione del dipendente nel database: {e}")
         return "Si è verificato un errore durante l'eliminazione del dipendente."
 
-@app.route('/cliente')
-def cliente():
-    return render_template('cliente.html')
 
 @app.route('/storico_prenotazioni', methods=['POST'])
 def storico_prenotazioni():
@@ -291,6 +299,42 @@ def storico_prenotazioni():
     except Exception as e:
         print(f"Si è verificato un errore durante il recupero dello storico delle prenotazioni: {e}")
         return "Si è verificato un errore durante il recupero dello storico delle prenotazioni."
+
+#---------------------------------------------------------------------------------------------------------------------#
+@app.route('/get_schedule')
+def get_schedule():
+    try:
+        period = request.args.get('period')  # period può essere 'daily', 'monthly', o 'annual'
+        print(f"Periodo richiesto: {period}")
+        schedule = {}
+        current_date = datetime.now().date()
+
+        cursor.execute("SELECT DISTINCT dipendente FROM prenotazione")
+        dipendenti = cursor.fetchall()
+        print("Dipendenti:", dipendenti)
+
+        for dipendente in dipendenti:
+            dipendente_id = dipendente[0]
+            if period == 'giornaliero':
+                cursor.execute("SELECT SUM(prezzo) FROM prenotazione WHERE DATE(data_inizio) = %s AND dipendente = %s", (current_date, dipendente_id))
+            elif period == 'mensile':
+                cursor.execute("SELECT SUM(prezzo) FROM prenotazione WHERE YEAR(data_inizio) = YEAR(CURDATE()) AND MONTH(data_inizio) = MONTH(CURDATE()) AND dipendente = %s", (dipendente_id,))
+            elif period == 'annuale':
+                cursor.execute("SELECT SUM(prezzo) FROM prenotazione WHERE YEAR(data_inizio) = YEAR(CURDATE()) AND dipendente = %s", (dipendente_id,))
+
+            fatturato = cursor.fetchone()[0]
+            print(f"Fatturato per dipendente {dipendente_id}: {fatturato}")
+            if fatturato is not None:
+                schedule[dipendente_id] = {'fatturato': float(fatturato)}
+            else:
+                schedule[dipendente_id] = {'fatturato': 0}
+
+        print("Programma di fatturazione:", schedule)
+        return jsonify(schedule)
+    except Exception as e:
+        print(f"Errore durante il recupero del programma di fatturazione: {e}")
+        return jsonify({'error': 'Errore durante il recupero del programma di fatturazione.'}), 500
+#---------------------------------------------------------------------------------------------------------------------#
 
 if __name__ == "__main__":
     app.run(debug=True)

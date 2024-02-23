@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Dipendenti</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/fatturato.css') }}">
+</head>
+<body>
+
+<div class="page-wrapper">
+    <div class="tabs">
+        <div class="tab">
+            <button class="tablinks" onclick="openTab(event, 'FatturatoGiornaliero')">Fatturato Giornaliero</button>
+        </div>
+        <div class="tab">
+            <button class="tablinks" onclick="openTab(event, 'FatturatoMensile')">Fatturato Mensile</button>
+        </div>
+        <div class="tab">
+            <button class="tablinks" onclick="openTab(event, 'FatturatoAnnuale')">Fatturato Annuale</button>
+        </div>
+    </div>
+
+    <!-- Fatturato Giornaliero -->
+    <div id="FatturatoGiornaliero" class="tabcontent">
+        <h2>Fatturato Giornaliero per Dipendente</h2>
+        <table id="tabella_fatturato_giornaliero">
+            <thead>
+            <tr>
+                <th>Dipendente</th>
+                <th>Fatturato (€)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Contenuto della tabella -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Fatturato Mensile -->
+    <div id="FatturatoMensile" class="tabcontent">
+        <h2>Fatturato Mensile per Dipendente</h2>
+        <table id="tabella_fatturato_mensile">
+            <thead>
+            <tr>
+                <th>Dipendente</th>
+                <th>Fatturato (€)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Contenuto della tabella -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Fatturato Annuale -->
+    <div id="FatturatoAnnuale" class="tabcontent">
+        <h2>Fatturato Annuale per Dipendente</h2>
+        <table id="tabella_fatturato_annuale">
+            <thead>
+            <tr>
+                <th>Dipendente</th>
+                <th>Fatturato (€)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Contenuto della tabella -->
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    // Definizione della funzione openTab
+    function openTab(event, tabName) {
+        // Visualizza il contenuto della tab corrispondente
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        document.getElementById(tabName).style.display = "block";
+    }
+
+    $(document).ready(function() {
+        // Funzione per ottenere e visualizzare il fatturato giornaliero, mensile o annuale per ogni dipendente
+        function getSchedule(period) {
+            $.getJSON('/get_schedule?period=' + period, function(data) {
+                var tableId;
+                if (period === 'giornaliero') {
+                    tableId = 'tabella_fatturato_giornaliero';
+                } else if (period === 'mensile') {
+                    tableId = 'tabella_fatturato_mensile';
+                } else if (period === 'annuale') {
+                    tableId = 'tabella_fatturato_annuale';
+                }
+
+                $('#' + tableId + ' tbody').empty(); // Svuota la tabella prima di aggiungere i nuovi dati
+
+                $.each(data, function(dipendente_id, info) {
+                    $('#' + tableId + ' tbody').append('<tr><td>' + dipendente_id + '</td><td>' + info.fatturato + '</td></tr>');
+                });
+            });
+        }
+
+        // Richiama la funzione getSchedule con il periodo corrispondente quando viene cliccato un tab
+        $('.tablinks').click(function() {
+            var period = $(this).text().split(' ')[1].toLowerCase();
+            getSchedule(period);
+        });
+    });
+</script>
+
+</body>
+</html>
