@@ -82,7 +82,7 @@ def get_daily_schedule():
 
     current_date = datetime.now().date()
 
-    cursor.execute("SELECT id, HOUR(data_inizio), HOUR(data_fine), dipendente, nome, descrizione FROM prenotazione WHERE DATE(data_inizio) = %s AND sede = 'Frattaminore'", (current_date,))
+    cursor.execute("SELECT id, HOUR(data_inizio), HOUR(data_fine), dipendente, nome, descrizione FROM prenotazione WHERE DATE(data_inizio) = %s AND sede = 'Frattamaggiore'", (current_date,))
     prenotazioni = cursor.fetchall()
 
     for prenotazione in prenotazioni:
@@ -119,7 +119,7 @@ def get_daily_schedule():
                 prenotazione_id = prenotazione['id']
                 cliente = prenotazione['cliente']
                 descrizione = prenotazione['descrizione']
-                cell_content += f'{cliente}<br><span style="font-size: 12px;">{descrizione}</span>'
+                cell_content += f'{cliente}<br><span style="font-size: 12px;">{descrizione}</span><br>'
                 cell_content += f'<span style="cursor: pointer;" onclick="eliminaPrenotazione({prenotazione_id}, \'{cliente}\', \'{descrizione}\')"> 🗑 </span>'
                 cell_content += f'<span style="cursor: pointer;" onclick="modificaPrenotazione({prenotazione_id})"> 📝 </span><br>'
             html_table += f'<td>{cell_content}</td>'
@@ -237,13 +237,13 @@ def leggi_dipendenti_aversa():
 
 def leggi_dipendenti():
     global cursor
-    cursor.execute('''SELECT nome FROM dipendente WHERE sede = 'Frattaminore' ''')
+    cursor.execute('''SELECT nome FROM dipendente WHERE sede = 'Frattamaggiore' ''')
     nomi_dipendenti = cursor.fetchall()
     return sorted([nome[0] for nome in nomi_dipendenti])
 
 def leggi_dipendenti_fratta():
     global cursor
-    cursor.execute('''SELECT nome FROM dipendente WHERE sede = 'Frattaminore' ''')
+    cursor.execute('''SELECT nome FROM dipendente WHERE sede = 'Frattamaggiore' ''')
     nomi_dipendenti = cursor.fetchall()
     return sorted([nome[0] for nome in nomi_dipendenti])
 

@@ -16,7 +16,7 @@
             <button class="tablinks active" onclick="openTab(event, 'nuovaPrenotazione')">Nuova Prenotazione</button>
         </div>
         <div class="tab">
-            <button class="tablinks" onclick="openTab(event, 'visualizzaPrenotazioniFrattaminore')" id="frattaminoreTab">Prenotazioni Frattaminore</button>
+            <button class="tablinks" onclick="openTab(event, 'visualizzaPrenotazioniFrattamaggiore')" id="FrattamaggioreTab">Prenotazioni Frattamaggiore</button>
         </div>
         <div class="tab">
             <button class="tablinks" onclick="openTab(event, 'visualizzaPrenotazioniAversa')" id="aversaTab">Prenotazioni Aversa</button>
@@ -49,7 +49,7 @@
                 <label for="sede">Sede:</label>
                 <select id="sede" name="sede" required>
                     <option value="Scegli sede">Scegli Sede</option>
-                    <option value="Frattaminore">Frattaminore</option>
+                    <option value="Frattamaggiore">Frattamaggiore</option>
                     <option value="Aversa">Aversa</option>
                 </select>
             </div>
@@ -75,11 +75,9 @@
         </form>
     </div>
 
-    <div id="visualizzaPrenotazioniFrattaminore" class="tabcontent" style="display: none;">
-        <!-- Contenuto della tab per visualizzare le prenotazioni giornaliere a Frattaminore -->
-        <h2>Prenotazioni Frattaminore</h2>
-        <div class="calendar" id="prenotazioniTableFrattaminore">
-            <!-- Qui verrà aggiunta la tabella delle prenotazioni giornaliere per Frattaminore -->
+    <div id="visualizzaPrenotazioniFrattamaggiore" class="tabcontent" style="display: none;">
+        <h2>Prenotazioni Frattamaggiore</h2>
+        <div class="calendar" id="prenotazioniTableFrattamaggiore">
         </div>
     </div>
 
@@ -109,31 +107,29 @@
         evt.currentTarget.classList.add("active");
 
         // Quando viene aperta la tabella delle prenotazioni, chiamiamo la funzione per visualizzarle
-        if (tabName === 'visualizzaPrenotazioniFrattaminore') {
-            visualizzaPrenotazioniFrattaminore();
+        if (tabName === 'visualizzaPrenotazioniFrattamaggiore') {
+            visualizzaPrenotazioniFrattamaggiore();
         } else if (tabName === 'visualizzaPrenotazioniAversa') {
             visualizzaPrenotazioniAversa();
         }
     }
 
-    // Funzione per ottenere e visualizzare le prenotazioni giornaliere a Frattaminore
-    function visualizzaPrenotazioniFrattaminore() {
-        fetch('/get_daily_schedule')  // Modificato il percorso per ottenere le prenotazioni di Frattaminore
+    function visualizzaPrenotazioniFrattamaggiore() {
+        fetch('/get_daily_schedule')
             .then(response => response.text())  // Otteniamo il testo HTML della tabella
             .then(data => {
-                const prenotazioniTable = document.getElementById('prenotazioniTableFrattaminore');
-                prenotazioniTable.innerHTML = data;  // Aggiorniamo il contenuto della divisione con la tabella HTML generata
+                const prenotazioniTable = document.getElementById('prenotazioniTableFrattamaggiore');
+                prenotazioniTable.innerHTML = data;
             })
             .catch(error => console.error('Si è verificato un errore:', error));
     }
 
-    // Funzione per ottenere e visualizzare le prenotazioni giornaliere ad Aversa
     function visualizzaPrenotazioniAversa() {
-        fetch('/get_daily_schedule_aversa')  // Modificato il percorso per ottenere le prenotazioni di Aversa
-            .then(response => response.text())  // Otteniamo il testo HTML della tabella
+        fetch('/get_daily_schedule_aversa')
+            .then(response => response.text())
             .then(data => {
                 const prenotazioniTable = document.getElementById('prenotazioniTableAversa');
-                prenotazioniTable.innerHTML = data;  // Aggiorniamo il contenuto della divisione con la tabella HTML generata
+                prenotazioniTable.innerHTML = data;
             })
             .catch(error => console.error('Si è verificato un errore:', error));
     }
@@ -143,7 +139,7 @@
             .then(response => response.json())
             .then(data => {
                 const dipendenteSelect = document.getElementById('dipendente');
-                dipendenteSelect.innerHTML = ''; // Pulisce il menù a tendina
+                dipendenteSelect.innerHTML = '';
                 data.forEach(dipendente => {
                     const option = document.createElement('option');
                     option.value = dipendente;
@@ -164,16 +160,16 @@
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    id: id // Includi l'ID della prenotazione nel corpo della richiesta
+                    id: id
                 })
             })
                 .then(response => {
                     if (response.ok) {
                         alert('Prenotazione eliminata con successo!');
-                        if (document.getElementById('visualizzaPrenotazioniFrattaminore').style.display === 'block') {
-                            visualizzaPrenotazioniFrattaminore(); // Aggiorniamo la tabella Frattaminore dopo l'eliminazione
+                        if (document.getElementById('visualizzaPrenotazioniFrattamaggiore').style.display === 'block') {
+                            visualizzaPrenotazioniFrattamaggiore();
                         } else if (document.getElementById('visualizzaPrenotazioniAversa').style.display === 'block') {
-                            visualizzaPrenotazioniAversa(); // Aggiorniamo la tabella Aversa dopo l'eliminazione
+                            visualizzaPrenotazioniAversa();
                         }
                     } else {
                         throw new Error('Si è verificato un problema durante l\'eliminazione della prenotazione.');
@@ -237,9 +233,8 @@
                 .then(response => {
                     if (response.ok) {
                         alert('Prenotazione modificata con successo!');
-                        // Aggiorna la tabella delle prenotazioni dopo la modifica
-                        if (document.getElementById('visualizzaPrenotazioniFrattaminore').style.display === 'block') {
-                            visualizzaPrenotazioniFrattaminore();
+                        if (document.getElementById('visualizzaPrenotazioniFrattamaggiore').style.display === 'block') {
+                            visualizzaPrenotazioniFrattamaggiore();
                         } else if (document.getElementById('visualizzaPrenotazioniAversa').style.display === 'block') {
                             visualizzaPrenotazioniAversa();
                         }
@@ -255,10 +250,8 @@
     }
 
 
-    // Chiama la funzione per visualizzare i dipendenti al caricamento della pagina
     document.addEventListener('DOMContentLoaded', visualizzaDipendenti);
 
-    // Aggiunta dell'event listener per il tab "Nuova Prenotazione"
     document.querySelector('.tablinks').addEventListener('click', function(event) {
         openTab(event, 'nuovaPrenotazione');
     });

@@ -1,29 +1,25 @@
-/* Stile per il wrapper generale della pagina */
-.page-wrapper {
-    max-width: 800px; /* Larghezza massima del riquadro */
-    margin: 50px auto; /* Centra il riquadro nella pagina e aggiunge spazio sopra */
-    padding: 20px; /* Aggiunge spazio intorno ai contenuti */
-    border: 2px solid #ccc; /* Aggiunge un bordo al riquadro */
-    border-radius: 10px; /* Aggiunge un bordo arrotondato */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Aggiunge un'ombra */
-    background-color: #fff; /* Colore di sfondo */
-}
-
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
     margin: 0;
     padding: 0;
+    background-image: url('../immagini/sfondo2.jpeg');
+
+    /* Imposta le dimensioni dello sfondo */
+    background-size: 50% auto; /* Puoi regolare i valori come preferisci */
+    background-repeat: no-repeat;
+    background-position: top center;
 }
 
 .container {
-    max-width: 600px;
-    margin: 50px auto;
-    background-color: #fff;
+    max-width: 250px;
+    margin: 100px auto 50px auto;
+    background-color: rgba(255, 255, 255, 0.8);
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
+
 
 h1 {
     text-align: center;
@@ -43,13 +39,15 @@ h1 {
     padding: 15px;
     border: none;
     border-radius: 5px;
-    background-color: #4caf50;
+    background-color: rgb(196, 158, 139);
     color: #fff;
     text-align: center;
     text-decoration: none;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .menu-button:hover {
-    background-color: #45a049;
+    background-color: rgb(217, 146, 107);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
 }
