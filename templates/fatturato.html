@@ -12,12 +12,15 @@
     <div class="tabs">
         <div class="tab">
             <button class="tablinks" onclick="openTab(event, 'FatturatoGiornaliero')">Fatturato Giornaliero</button>
+            <div id="totale_fatturato_giornaliero"></div> <!-- Totale giornaliero -->
         </div>
         <div class="tab">
             <button class="tablinks" onclick="openTab(event, 'FatturatoMensile')">Fatturato Mensile</button>
+            <div id="totale_fatturato_mensile"></div> <!-- Totale mensile -->
         </div>
         <div class="tab">
             <button class="tablinks" onclick="openTab(event, 'FatturatoAnnuale')">Fatturato Annuale</button>
+            <div id="totale_fatturato_annuale"></div> <!-- Totale annuale -->
         </div>
     </div>
 
@@ -88,20 +91,27 @@
         // Funzione per ottenere e visualizzare il fatturato giornaliero, mensile o annuale per ogni dipendente
         function getSchedule(period) {
             $.getJSON('/get_schedule?period=' + period, function(data) {
-                var tableId;
+                var tableId, totalId;
                 if (period === 'giornaliero') {
                     tableId = 'tabella_fatturato_giornaliero';
+                    totalId = 'totale_fatturato_giornaliero';
                 } else if (period === 'mensile') {
                     tableId = 'tabella_fatturato_mensile';
+                    totalId = 'totale_fatturato_mensile';
                 } else if (period === 'annuale') {
                     tableId = 'tabella_fatturato_annuale';
+                    totalId = 'totale_fatturato_annuale';
                 }
 
                 $('#' + tableId + ' tbody').empty(); // Svuota la tabella prima di aggiungere i nuovi dati
+                var totalFatturato = 0;
 
                 $.each(data, function(dipendente_id, info) {
                     $('#' + tableId + ' tbody').append('<tr><td>' + dipendente_id + '</td><td>' + info.fatturato + '</td></tr>');
+                    totalFatturato += info.fatturato; // Aggiungi il fatturato del dipendente al totale
                 });
+
+                $('#' + totalId).text('Totale: ' + totalFatturato.toFixed(2) + ' €');
             });
         }
 
