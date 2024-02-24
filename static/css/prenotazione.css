@@ -33,6 +33,17 @@ h1 {
 .form-group {
     margin-bottom: 20px;
 }
+#dipendente {
+    width: 100%; /* Fai in modo che il menù a tendina riempia completamente il suo contenitore */
+    padding: 10px; /* Aggiungi spazio intorno alle opzioni */
+    border: 1px solid #ccc; /* Aggiungi un bordo */
+    border-radius: 5px; /* Bordi arrotondati */
+    box-sizing: border-box; /* Fai in modo che il padding e il bordo non aumentino le dimensioni totali */
+    background-color: #fff; /* Colore di sfondo */
+    font-size: 16px; /* Imposta la dimensione del carattere */
+    color: #333; /* Colore del testo */
+    margin-bottom: 10px; /* Aggiungi margine inferiore per separarlo dagli altri elementi */
+}
 
 label {
     display: block;
@@ -50,7 +61,7 @@ input[type="submit"] {
 }
 
 input[type="submit"] {
-    background-color: #4caf50;
+    background-color: #c58846;
     color: #fff;
     cursor: pointer;
     transition: background-color 0.3s;
@@ -60,7 +71,7 @@ input[type="submit"] {
 
 
 input[type="submit"]:hover {
-    background-color: #45a049;
+    background-color: #cb7b2b;
 }
 
 /* Calendario */
@@ -112,13 +123,13 @@ input[type="submit"]:hover {
     background-color: #ddd;
 }
 
+.tab button.active {
+    background-color: #ccc; /* Imposta lo sfondo della tab attiva */
+}
+
 .tabcontent {
     display: none;
     padding: 20px;
     border-top: none;
     clear: both;
-}
-
-.active {
-    background-color: #ccc;
 }

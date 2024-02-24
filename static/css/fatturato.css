@@ -49,14 +49,14 @@ select { /* Aggiunto stile per i menu a tendina */
 }
 
 input[type="submit"] {
-    background-color: #4caf50;
+    background-color: #c58846;
     color: #fff;
     cursor: pointer;
     transition: background-color 0.3s;
 }
 
 input[type="submit"]:hover {
-    background-color: #45a049;
+    background-color: #cb7b2b;
 }
 
 /* Stile per i messaggi di errore */

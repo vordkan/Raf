@@ -49,14 +49,14 @@ select { /* Aggiunto stile per i menu a tendina */
 }
 
 input[type="submit"] {
-    background-color: #4caf50;
+    background-color: #c58846;
     color: #fff;
     cursor: pointer;
     transition: background-color 0.3s;
 }
 
 input[type="submit"]:hover {
-    background-color: #45a049;
+    background-color: #cb7b2b;
 }
 
 /* Stile per i messaggi di errore */
@@ -114,13 +114,13 @@ input[type="submit"]:hover {
     background-color: #ddd;
 }
 
+.tab button.active {
+    background-color: #ddd; /* Imposta lo sfondo della tab attiva */
+}
+
 .tabcontent {
     display: none;
     padding: 20px;
     border-top: none;
     clear: both;
-}
-
-.active {
-    background-color: #ddd;
 }

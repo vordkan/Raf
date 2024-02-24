@@ -64,7 +64,10 @@ def submit():
         start_datetime = datetime.strptime(request.form['start_datetime'], "%Y-%m-%dT%H:%M")
         end_datetime = datetime.strptime(request.form['end_datetime'], "%Y-%m-%dT%H:%M")
         dipendente = request.form['dipendente']
-        sede = request.form['sede']
+
+        cursor.execute('''SELECT sede FROM dipendente WHERE nome = %s''', (dipendente,))
+        sede = cursor.fetchone()[0]
+
         prezzo = request.form['prezzo']
 
         cursor.execute('''INSERT INTO prenotazione (nome, descrizione, dipendente, sede, data_inizio, data_fine, prezzo) VALUES (%s, %s, %s, %s, %s, %s, %s)''', (summary, description, dipendente, sede, start_datetime, end_datetime, prezzo))

@@ -4,22 +4,10 @@ body {
     margin: 0;
     padding: 0;
     background-image: url('../immagini/sfondo2.jpeg');
-
-    /* Imposta le dimensioni dello sfondo */
-    background-size: 50% auto; /* Puoi regolare i valori come preferisci */
+    background-size: 53% auto;
     background-repeat: no-repeat;
     background-position: top center;
 }
-
-.container {
-    max-width: 250px;
-    margin: 100px auto 50px auto;
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
 
 h1 {
     text-align: center;
@@ -27,27 +15,45 @@ h1 {
     margin-bottom: 30px;
 }
 
+
+.container {
+    max-width: 250px;
+    margin: 4px auto 50px auto;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex; /* Imposta il display del contenitore principale su flex */
+    flex-direction: column; /* Imposta la direzione del flex su column */
+    align-items: center; /* Centra gli elementi lungo l'asse orizzontale */
+}
+
 .menu-buttons {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    width: 100%; /* Imposta la larghezza al 100% del contenitore principale */
+    align-items: center; /* Centra gli elementi lungo l'asse orizzontale */
 }
 
+
 .menu-button {
-    display: inline-block;
-    width: auto;
+    width: 100%; /* Imposta la larghezza al 100% del contenitore */
+    max-width: 200px; /* Imposta una larghezza massima per evitare che diventino troppo larghi su schermi grandi */
     padding: 15px;
     border: none;
     border-radius: 5px;
-    background-color: rgb(196, 158, 139);
+    background-color: rgb(197, 136, 70);
     color: #fff;
     text-align: center;
     text-decoration: none;
     transition: background-color 0.3s, box-shadow 0.3s;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 0 auto; /* Centra il pulsante nel contenitore */
 }
 
+
 .menu-button:hover {
-    background-color: rgb(217, 146, 107);
+    background-color: rgb(203, 123, 43);
     box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
 }

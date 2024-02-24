@@ -62,13 +62,13 @@ button {
     padding: 10px 20px;
     border: none;
     border-radius: 4px;
-    background-color: #4caf50;
+    background-color: #c58846;
     color: #fff;
     cursor: pointer;
 }
 
 button:hover {
-    background-color: #316e31;
+    background-color: #cb7b2b;
 }
 
 /* Stile per la tabella */
