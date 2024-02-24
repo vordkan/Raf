@@ -18,7 +18,7 @@
         </div>
     </div>
 
-    <div id="aggiungiDipendente" class="tabcontent" style="display: none;">
+    <div id="aggiungiDipendente" class="tabcontent" style="display: block;">
         <!-- Contenuto della tab per aggiungere un dipendente -->
         <h2>Aggiungi Dipendente</h2>
         <form action="/aggiungi_dipendente" method="post">
@@ -40,6 +40,7 @@
             </div>
         </form>
     </div>
+
     <div id="eliminaDipendente" class="tabcontent" style="display: none;">
         <!-- Contenuto della tab per eliminare un dipendente -->
         <h2>Elimina Dipendente</h2>
@@ -62,6 +63,7 @@
 </div> <!-- Chiuso il wrapper generale della pagina -->
 
 <script>
+
     function openTab(evt, tabName) {
         var i, tabcontent, tablinks;
         tabcontent = document.getElementsByClassName("tabcontent");

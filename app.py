@@ -328,7 +328,7 @@ def storico_prenotazioni():
 @app.route('/get_schedule')
 def get_schedule():
     try:
-        period = request.args.get('period')  # period può essere 'daily', 'monthly', o 'annual'
+        period = request.args.get('period')  # period può essere 'daily', 'monthly', 'annual'
         print(f"Periodo richiesto: {period}")
         schedule = {}
         current_date = datetime.now().date()
@@ -344,7 +344,10 @@ def get_schedule():
             elif period == 'mensile':
                 cursor.execute("SELECT SUM(prezzo) FROM prenotazione WHERE YEAR(data_inizio) = YEAR(CURDATE()) AND MONTH(data_inizio) = MONTH(CURDATE()) AND dipendente = %s", (dipendente_id,))
             elif period == 'annuale':
-                cursor.execute("SELECT SUM(prezzo) FROM prenotazione WHERE YEAR(data_inizio) = YEAR(CURDATE()) AND dipendente = %s", (dipendente_id,))
+                selected_year = request.args.get('anno')  # Ottieni l'anno selezionato dall'utente
+                if not selected_year:  # Se il parametro anno è vuoto, usa l'anno attuale
+                    selected_year = datetime.now().year
+                cursor.execute("SELECT SUM(prezzo) FROM prenotazione WHERE YEAR(data_inizio) = %s AND dipendente = %s", (selected_year, dipendente_id))
 
             fatturato = cursor.fetchone()[0]
             print(f"Fatturato per dipendente {dipendente_id}: {fatturato}")
@@ -358,6 +361,7 @@ def get_schedule():
     except Exception as e:
         print(f"Errore durante il recupero del programma di fatturazione: {e}")
         return jsonify({'error': 'Errore durante il recupero del programma di fatturazione.'}), 500
+
 #---------------------------------------------------------------------------------------------------------------------#
 
 if __name__ == "__main__":
