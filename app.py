@@ -55,6 +55,11 @@ def gestione_dipendenti():
 def fatturato():
     return render_template('fatturato.html')
 
+# Merce
+@app.route('/merce')
+def merce():
+    return render_template('merci.html')
+
 
 @app.route('/submit', methods=['POST'])
 def submit():
@@ -366,6 +371,71 @@ def get_schedule():
         return jsonify({'error': 'Errore durante il recupero del programma di fatturazione.'}), 500
 
 #---------------------------------------------------------------------------------------------------------------------#
+@app.route('/carica_merce', methods=['POST'])
+def carica_merce():
+    id_merce = request.form['id_merce']
+    nome_merce = request.form['nome_merce']
+    descrizione_merce = request.form['descrizione_merce']
+    quantita_merce = int(request.form['quantita_merce'])
+    prezzo_merce = float(request.form['prezzo_merce'])
+    data_carico = datetime.utcnow()
+
+    try:
+        cursor.execute("INSERT INTO merci (ID, nome, descrizione, quantita, prezzo, data_carico) VALUES (%s, %s, %s, %s, %s, %s)",
+                       (id_merce, nome_merce, descrizione_merce, quantita_merce, prezzo_merce, data_carico))
+        conn.commit()
+
+        # Chiamata alla funzione JavaScript per visualizzare il messaggio di successo
+        return jsonify({"success": "Carico avvenuto con successo!"}), 200
+    except Exception as e:
+        print(f"Si è verificato un errore durante l'inserimento della merce nel database: {e}")
+        return "Si è verificato un errore durante l'inserimento della merce."
+
+
+
+@app.route('/scarica_merce', methods=['POST'])
+def scarica_merce():
+    id_merce = request.form['id_merceS']
+    quantita_scarico = int(request.form['quantita_scarico'])
+
+    try:
+        # Verifica se la merce esiste
+        cursor.execute("SELECT quantita FROM merci WHERE ID = %s", (id_merce,))
+        result = cursor.fetchone()
+
+        if result:
+            quantita_attuale = result[0]
+            if quantita_scarico <= quantita_attuale:
+                # Aggiorna la quantità di merce nel database
+                nuova_quantita = quantita_attuale - quantita_scarico
+                cursor.execute("UPDATE merci SET quantita = %s WHERE ID = %s", (nuova_quantita, id_merce))
+                conn.commit()
+                print("Scarico avvenuto con successo!")
+                return "Scarico avvenuto con successo!"
+            else:
+                return "Quantità da scaricare superiore alla quantità attuale."
+        else:
+            return "Merce non trovata."
+
+    except Exception as e:
+        print(f"Si è verificato un errore durante lo scarico della merce: {e}")
+        return "Si è verificato un errore durante lo scarico della merce."
+
+
+@app.route('/visualizza_merce', methods=['GET'])
+def visualizza_merce():
+    try:
+        cursor.execute("SELECT ID, nome, descrizione, quantita, prezzo, data_carico FROM merci")
+        merci = cursor.fetchall()
+        return jsonify(merci)
+    except Exception as e:
+        print(f"Si è verificato un errore durante il recupero delle merci: {e}")
+        return jsonify({"error": "Si è verificato un errore durante il recupero delle merci."}), 500
+
+
+
+#---------------------------------------------------------------------------------------------------------------------#
+
 
 if __name__ == "__main__":
     app.run(debug=True)

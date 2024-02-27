@@ -16,3 +16,12 @@ create table dipendente(
     sede varchar(20)
 )
 
+CREATE TABLE merci(
+    ID INT PRIMARY KEY,
+    nome VARCHAR(100),
+    descrizione TEXT,
+    quantita INT,
+    prezzo DECIMAL(10, 2),
+    data_carico TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    data_scarico TIMESTAMP
+);

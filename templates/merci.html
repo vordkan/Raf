@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Merci</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dipendente.css') }}">
+</head>
+<body>
+
+<div class="page-wrapper">
+    <h1>Gestione Merci</h1>
+
+    <div class="tabs">
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'aggiungiMerce')">Aggiungi Merce</button>
+        </div>
+        <div class="tab">
+            <button class="tablinks" onclick="openTab(event, 'eliminaMerce')">Scarica Merce</button>
+        </div>
+        <div class="tab">
+            <button class="tablinks" onclick="openTab(event, 'visualizzaMerce')">Visualizza Merce</button>
+        </div>
+    </div>
+
+    <div id="aggiungiMerce" class="tabcontent">
+        <h2>Aggiungi Merce</h2>
+        <form action="/carica_merce" method="post">
+            <div class="form-group">
+                <label for="id_merce">ID Merce:</label>
+                <input type="text" id="id_merce" name="id_merce" required>
+            </div>
+
+            <div class="form-group">
+                <label for="nome_merce">Nome:</label>
+                <input type="text" id="nome_merce" name="nome_merce" required>
+            </div>
+
+            <div class="form-group">
+                <label for="descrizione_merce">Descrizione:</label>
+                <textarea id="descrizione_merce" name="descrizione_merce" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="quantita_merce">Quantità:</label>
+                <input type="number" id="quantita_merce" name="quantita_merce" required>
+            </div>
+
+            <div class="form-group">
+                <label for="prezzo_merce">Prezzo:</label>
+                <input type="text" id="prezzo_merce" name="prezzo_merce" required>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Aggiungi">
+            </div>
+        </form>
+    </div>
+
+    <div id="eliminaMerce" class="tabcontent">
+        <h2>Scarica Merce</h2>
+        <form action="/scarica_merce" method="post">
+            <div class="form-group">
+                <label for="id_merceS">ID Merce:</label>
+                <input type="text" id="id_merceS" name="id_merceS" required>
+            </div>
+
+            <div class="form-group">
+                <label for="quantita_scarico">Quantità da scaricare:</label>
+                <input type="number" id="quantita_scarico" name="quantita_scarico" required>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Scarica">
+            </div>
+        </form>
+    </div>
+
+    <div id="visualizzaMerce" class="tabcontent">
+        <h2>Visualizza Merce</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Descrizione</th>
+                <th>Quantità</th>
+                <th>Prezzo</th>
+                <th>Data Carico</th>
+            </tr>
+            </thead>
+            <tbody id="merceTableBody">
+            {% for merce in merci %}
+            <tr>
+                <td>{{ merce[0] }}</td>
+                <td>{{ merce[1] }}</td>
+                <td>{{ merce[2] }}</td>
+                <td>{{ merce[3] }}</td>
+                <td>{{ merce[4] }}</td>
+                <td>{{ merce[5] }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].classList.remove("active");
+        }
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.classList.add("active");
+
+        if (tabName === 'visualizzaMerce') {
+            visualizzaMerce();
+        }
+    }
+
+    function visualizzaMerce() {
+        fetch('/visualizza_merce')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Errore durante il recupero dei dati');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const tableBody = document.getElementById('merceTableBody');
+                tableBody.innerHTML = ''; // Pulisci i dati precedenti
+
+                data.forEach(merce => {
+                    const row = document.createElement('tr');
+                    // Formatta la data
+                    const dataCarico = new Date(merce[5]).toLocaleDateString('it-IT');
+                    row.innerHTML = `
+                    <td>${merce[0]}</td>
+                    <td>${merce[1]}</td>
+                    <td>${merce[2]}</td>
+                    <td>${merce[3]}</td>
+                    <td>${merce[4]}</td>
+                    <td>${dataCarico}</td>
+                `;
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error('Errore durante il recupero dei dati:', error);
+                // Gestisci l'errore in modo appropriato, ad esempio mostrando un messaggio all'utente
+            });
+    
+    }
+
+</script>
+
+</body>
+</html>
