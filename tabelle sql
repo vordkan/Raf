@@ -17,7 +17,7 @@ create table dipendente(
 )
 
 CREATE TABLE merci(
-    ID INT PRIMARY KEY,
+    ID VARCHAR(40) PRIMARY KEY,
     nome VARCHAR(100),
     descrizione TEXT,
     quantita INT,

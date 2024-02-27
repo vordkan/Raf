@@ -124,3 +124,14 @@ input[type="submit"]:hover {
     border-top: none;
     clear: both;
 }
+
+/* Stile per il messaggio di successo */
+#addMessage {
+    display: none; /* Inizialmente nascosto */
+    background-color: #d4edda; /* Colore di sfondo verde */
+    color: #155724; /* Colore del testo verde scuro */
+    padding: 10px; /* Spazio interno */
+    border-radius: 5px; /* Bordo arrotondato */
+    margin-top: 10px; /* Spazio sopra il messaggio */
+    text-align: center; /* Testo centrato */
+}

@@ -25,7 +25,7 @@
 
     <div id="aggiungiMerce" class="tabcontent">
         <h2>Aggiungi Merce</h2>
-        <form action="/carica_merce" method="post">
+        <form id="addForm" action="/carica_merce" method="post">
             <div class="form-group">
                 <label for="id_merce">ID Merce:</label>
                 <input type="text" id="id_merce" name="id_merce" required>
@@ -55,11 +55,12 @@
                 <input type="submit" value="Aggiungi">
             </div>
         </form>
+        <div id="addMessage" class="message" style="display: none;"></div>
     </div>
 
     <div id="eliminaMerce" class="tabcontent">
         <h2>Scarica Merce</h2>
-        <form action="/scarica_merce" method="post">
+        <form id="deleteForm" action="/scarica_merce" method="post">
             <div class="form-group">
                 <label for="id_merceS">ID Merce:</label>
                 <input type="text" id="id_merceS" name="id_merceS" required>
@@ -74,6 +75,7 @@
                 <input type="submit" value="Scarica">
             </div>
         </form>
+        <div id="deleteMessage" class="message" style="display: none;"></div>
     </div>
 
     <div id="visualizzaMerce" class="tabcontent">
@@ -90,16 +92,7 @@
             </tr>
             </thead>
             <tbody id="merceTableBody">
-            {% for merce in merci %}
-            <tr>
-                <td>{{ merce[0] }}</td>
-                <td>{{ merce[1] }}</td>
-                <td>{{ merce[2] }}</td>
-                <td>{{ merce[3] }}</td>
-                <td>{{ merce[4] }}</td>
-                <td>{{ merce[5] }}</td>
-            </tr>
-            {% endfor %}
+            <!-- I dati delle merci verranno inseriti qui tramite JavaScript -->
             </tbody>
         </table>
     </div>
@@ -107,20 +100,47 @@
 
 <script>
     function openTab(evt, tabName) {
-        var i, tabcontent, tablinks;
-        tabcontent = document.getElementsByClassName("tabcontent");
-        for (i = 0; i < tabcontent.length; i++) {
-            tabcontent[i].style.display = "none";
-        }
-        tablinks = document.getElementsByClassName("tablinks");
-        for (i = 0; i < tablinks.length; i++) {
-            tablinks[i].classList.remove("active");
-        }
-        document.getElementById(tabName).style.display = "block";
-        evt.currentTarget.classList.add("active");
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].classList.remove("active");
+    }
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.classList.add("active");
 
-        if (tabName === 'visualizzaMerce') {
-            visualizzaMerce();
+    if (tabName === 'visualizzaMerce') {
+        visualizzaMerce();
+    }
+}
+
+    function eliminaMerce(idMerce) {
+        if (confirm("Sei sicuro di voler eliminare questa merce?")) {
+            fetch('/elimina_merce', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({id_merce: idMerce})
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Errore durante l\'eliminazione della merce');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(data); // Puoi gestire la risposta come desiderato
+                    // Aggiorna la visualizzazione dopo l'eliminazione
+                    visualizzaMerce();
+                })
+                .catch(error => {
+                    console.error('Errore durante l\'eliminazione della merce:', error);
+                    // Gestisci l'errore in modo appropriato, ad esempio mostrando un messaggio all'utente
+                });
         }
     }
 
@@ -147,6 +167,7 @@
                     <td>${merce[3]}</td>
                     <td>${merce[4]}</td>
                     <td>${dataCarico}</td>
+                    <td><button onclick="eliminaMerce('${merce[0]}')">🗑</button></td>
                 `;
                     tableBody.appendChild(row);
                 });
@@ -155,8 +176,71 @@
                 console.error('Errore durante il recupero dei dati:', error);
                 // Gestisci l'errore in modo appropriato, ad esempio mostrando un messaggio all'utente
             });
-    
+
     }
+
+
+document.getElementById('addForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const formData = new FormData(this);
+
+    fetch('/carica_merce', {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Errore durante l\'aggiunta della merce');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                document.getElementById('addMessage').innerText = data.message;
+                document.getElementById('addMessage').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('addMessage').style.display = 'none';
+                }, 3000); // Nasconde il messaggio dopo 3 secondi
+                this.reset(); // Resetta il form
+            } else {
+                console.error('Errore durante l\'aggiunta della merce:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Errore durante l\'aggiunta della merce:', error);
+        });
+});
+
+document.getElementById('deleteForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const formData = new FormData(this);
+
+    fetch('/scarica_merce', {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Errore durante lo scarico della merce');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                document.getElementById('deleteMessage').innerText = data.message;
+                document.getElementById('deleteMessage').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('deleteMessage').style.display = 'none';
+                }, 3000); // Nasconde il messaggio dopo 3 secondi
+                this.reset(); // Resetta il form
+            } else {
+                console.error('Errore durante lo scarico della merce:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Errore durante lo scarico della merce:', error);
+        });
+});
 
 </script>
 

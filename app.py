@@ -385,12 +385,11 @@ def carica_merce():
                        (id_merce, nome_merce, descrizione_merce, quantita_merce, prezzo_merce, data_carico))
         conn.commit()
 
-        # Chiamata alla funzione JavaScript per visualizzare il messaggio di successo
-        return jsonify({"success": "Carico avvenuto con successo!"}), 200
+        # Restituisci un messaggio di successo senza visualizzare una schermata
+        return jsonify({"success": True, "message": "Carico avvenuto con successo!"}), 200
     except Exception as e:
         print(f"Si è verificato un errore durante l'inserimento della merce nel database: {e}")
-        return "Si è verificato un errore durante l'inserimento della merce."
-
+        return jsonify({"error": "Si è verificato un errore durante l'inserimento della merce nel database."}), 500
 
 
 @app.route('/scarica_merce', methods=['POST'])
@@ -410,16 +409,15 @@ def scarica_merce():
                 nuova_quantita = quantita_attuale - quantita_scarico
                 cursor.execute("UPDATE merci SET quantita = %s WHERE ID = %s", (nuova_quantita, id_merce))
                 conn.commit()
-                print("Scarico avvenuto con successo!")
-                return "Scarico avvenuto con successo!"
+                # Restituisci un messaggio di successo senza visualizzare una schermata
+                return jsonify({"success": True, "message": "Carico avvenuto con successo!"}), 200
             else:
-                return "Quantità da scaricare superiore alla quantità attuale."
+                return jsonify({"error": "Quantità da scaricare superiore alla quantità attuale."}), 400
         else:
-            return "Merce non trovata."
-
+            return jsonify({"error": "Merce non trovata."}), 404
     except Exception as e:
         print(f"Si è verificato un errore durante lo scarico della merce: {e}")
-        return "Si è verificato un errore durante lo scarico della merce."
+        return jsonify({"error": "Si è verificato un errore durante lo scarico della merce."}), 500
 
 
 @app.route('/visualizza_merce', methods=['GET'])
@@ -427,12 +425,24 @@ def visualizza_merce():
     try:
         cursor.execute("SELECT ID, nome, descrizione, quantita, prezzo, data_carico FROM merci")
         merci = cursor.fetchall()
-        return jsonify(merci)
+        if merci:
+            return jsonify(merci)
+        else:
+            return jsonify([])
     except Exception as e:
         print(f"Si è verificato un errore durante il recupero delle merci: {e}")
         return jsonify({"error": "Si è verificato un errore durante il recupero delle merci."}), 500
 
 
+@app.route('/elimina_merce', methods=['POST'])
+def elimina_merce():
+    try:
+        id_merce = request.json['id_merce']
+        cursor.execute("DELETE FROM merci WHERE ID = %s", (id_merce,))
+        conn.commit()
+        return jsonify({'success': True, 'message': 'Merce eliminata con successo!'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
 
 #---------------------------------------------------------------------------------------------------------------------#
 
