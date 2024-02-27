@@ -21,6 +21,10 @@
         <div class="tab">
             <button class="tablinks" onclick="openTab(event, 'visualizzaPrenotazioniAversa')" id="aversaTab">Prenotazioni Aversa</button>
         </div>
+
+        <div class="tab">
+            <button class="tablinks" onclick="openTab(event, 'visualizzaTutteLePrenotazioni')" id="prenotazioniTab">Prenotazioni</button>
+        </div>
     </div>
 
     <div id="nuovaPrenotazione" class="tabcontent">
@@ -79,6 +83,20 @@
         </div>
     </div>
 
+    <div id="visualizzaTutteLePrenotazioni" class="tabcontent" style="display: none;">
+        <!-- Contenuto della tab per visualizzare tutte le prenotazioni -->
+        <h2>Tutte le Prenotazioni</h2>
+        <input type="date" id="dataSelezionata">
+        <select id="sede" name="sede" required>
+            <option value="null">Seleziona sede</option>
+            <option value="Frattamaggiore">Frattamaggiore</option>
+            <option value="Aversa">Aversa</option>
+        </select>
+        <div class="calendar" id="tutteLePrenotazioni">
+            <!-- Qui verrà aggiunta la tabella di tutte le prenotazioni -->
+        </div>
+    </div>
+
 </div> <!-- Chiuso il wrapper generale della pagina -->
 
 
@@ -101,6 +119,8 @@
             visualizzaPrenotazioniFrattamaggiore();
         } else if (tabName === 'visualizzaPrenotazioniAversa') {
             visualizzaPrenotazioniAversa();
+        } else if (tabName === 'visualizzaTutteLePrenotazioni') {
+            visualizzaTutteLePrenotazioni();
         }
     }
 
@@ -262,6 +282,36 @@
         }
     }
 
+    document.addEventListener("DOMContentLoaded", function() {
+        // Ottieni riferimenti agli elementi HTML
+        const dataSelezionata = document.getElementById('dataSelezionata');
+        const sedeSelect = document.getElementById('sede');
+
+        // Aggiungi un listener per l'evento change alla data e alla sede
+        dataSelezionata.addEventListener('change', visualizzaTutteLePrenotazioni);
+        sedeSelect.addEventListener('change', visualizzaTutteLePrenotazioni);
+    });
+
+    function visualizzaTutteLePrenotazioni() {
+        // Ottieni i valori della data e della sede
+        const data = document.getElementById('dataSelezionata').value;
+        const sede = document.getElementById('sede').value;
+
+        // Effettua la richiesta con i valori ottenuti
+        fetch('/get_weekly_schedule', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ data: data, sede: sede })
+        })
+            .then(response => response.text())
+            .then(data => {
+                const tutteLePrenotazioniTable = document.getElementById('tutteLePrenotazioni');
+                tutteLePrenotazioniTable.innerHTML = data;
+            })
+            .catch(error => console.error('Si è verificato un errore:', error));
+    }
 
 
     document.addEventListener('DOMContentLoaded', visualizzaDipendenti);

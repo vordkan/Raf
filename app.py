@@ -60,7 +60,7 @@ def fatturato():
 def merce():
     return render_template('merci.html')
 
-
+#---------------------------------------------------------------------------------------------------------------------#
 @app.route('/submit', methods=['POST'])
 def submit():
     try:
@@ -190,6 +190,91 @@ def get_daily_schedule_aversa():
 
     return html_table
 
+from flask import jsonify
+from datetime import datetime
+
+from datetime import datetime
+
+@app.route('/get_weekly_schedule', methods=['POST'])
+def get_weekly_schedule():
+    daily_schedule = {}
+
+    # Ottenere la data e la sede dal parametro della richiesta
+    request_data = request.json
+    current_date_str = request_data.get('data')
+    current_sede = request_data.get('sede')
+
+    if current_date_str is None or current_sede is None:
+        return "Seleziona una data e una sede"
+
+    try:
+        current_date = datetime.strptime(current_date_str, '%Y-%m-%d').date()
+    except ValueError:
+        return "Seleziona una data e una sede"
+
+    if current_sede.lower() == 'aversa':
+        cursor.execute("SELECT id, HOUR(data_inizio), HOUR(data_fine), dipendente, nome, descrizione FROM prenotazione WHERE DATE(data_inizio) = %s AND sede = 'Aversa'", (current_date,))
+    else:
+        cursor.execute("SELECT id, HOUR(data_inizio), HOUR(data_fine), dipendente, nome, descrizione FROM prenotazione WHERE DATE(data_inizio) = %s AND sede = 'Frattamaggiore'", (current_date,))
+
+    prenotazioni = cursor.fetchall()
+
+    for prenotazione in prenotazioni:
+        prenotazione_id = prenotazione[0]
+        ora_inizio = prenotazione[1]
+        ora_fine = prenotazione[2]
+        dipendente = prenotazione[3]
+        cliente = prenotazione[4]
+        descrizione = prenotazione[5]
+
+        for ora in range(ora_inizio, ora_fine + 1):
+            ora_str = str(ora).zfill(2)
+
+            if ora_str not in daily_schedule:
+                daily_schedule[ora_str] = {}
+
+            if dipendente not in daily_schedule[ora_str]:
+                daily_schedule[ora_str][dipendente] = []
+
+            daily_schedule[ora_str][dipendente].append({'id': prenotazione_id, 'cliente': cliente.lower(), 'descrizione': descrizione.lower()})
+
+    html_table = '<table border="1"><tr><th>Ora</th>'
+    if current_sede.lower() == 'aversa':
+        for dipendente in leggi_dipendenti_aversa():
+            html_table += f'<th>{dipendente}</th>'
+    else:
+        for dipendente in leggi_dipendenti():
+            html_table += f'<th>{dipendente}</th>'
+    html_table += '</tr>'
+
+    for ora in range(7, 23):
+        ora_str = str(ora).zfill(2)
+        html_table += f'<tr><td>{ora_str}:00</td>'
+        if current_sede.lower() == 'aversa':
+            for dipendente in leggi_dipendenti_aversa():
+                prenotazioni = daily_schedule.get(ora_str, {}).get(dipendente, [])
+                cell_content = ''
+                for prenotazione in prenotazioni:
+                    prenotazione_id = prenotazione['id']
+                    cliente = prenotazione['cliente']
+                    descrizione = prenotazione['descrizione']
+                    cell_content += f'{cliente}<br><span style="font-size: 12px;">{descrizione}</span><br>'
+                html_table += f'<td>{cell_content}</td>'
+        else:
+            for dipendente in leggi_dipendenti():
+                prenotazioni = daily_schedule.get(ora_str, {}).get(dipendente, [])
+                cell_content = ''
+                for prenotazione in prenotazioni:
+                    prenotazione_id = prenotazione['id']
+                    cliente = prenotazione['cliente']
+                    descrizione = prenotazione['descrizione']
+                    cell_content += f'{cliente}<br><span style="font-size: 12px;">{descrizione}</span><br>'
+                html_table += f'<td>{cell_content}</td>'
+
+    return html_table
+
+
+#---------------------------------------------------------------------------------------------------------------------#
 
 @app.route('/modifica_prenotazione', methods=['POST'])
 def modifica_prenotazione():
@@ -260,7 +345,7 @@ def elimina_prenotazione():
 @app.route('/visualizza_prenotazioni')
 def visualizza_prenotazioni():
     return render_template('visualizza_prenotazioni.html')
-
+#---------------------------------------------------------------------------------------------------------------------#
 def leggi_dipendenti_aversa():
     global cursor
     cursor.execute('''SELECT nome FROM dipendente WHERE sede = 'Aversa' ''')
@@ -318,7 +403,7 @@ def elimina_dipendente():
     except Exception as e:
         print(f"Si è verificato un errore durante l'eliminazione del dipendente nel database: {e}")
         return "Si è verificato un errore durante l'eliminazione del dipendente."
-
+#---------------------------------------------------------------------------------------------------------------------#
 
 @app.route('/storico_prenotazioni', methods=['POST'])
 def storico_prenotazioni():
