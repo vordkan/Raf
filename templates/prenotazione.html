@@ -160,8 +160,53 @@
             .catch(error => console.error('Si è verificato un errore:', error));
     }
 
+    function modificaPrenotazione(id) {
+        // Otteniamo i nuovi dettagli dalla finestra di modifica
+        const nuovaDescrizione = prompt("Inserisci la nuova descrizione:");
+        const nuovoPrezzo = prompt("Inserisci il nuovo prezzo:");
 
+        // Verifichiamo se l'utente ha inserito una nuova descrizione o un nuovo prezzo
+        if (nuovaDescrizione !== null || nuovoPrezzo !== null) {
+            // Costruiamo il payload da inviare al backend
+            const payload = {
+                prenotazione_id: id
+            };
+            if (nuovaDescrizione !== null) {
+                payload.nuova_descrizione = nuovaDescrizione;
+            }
+            if (nuovoPrezzo !== null) {
+                payload.nuovo_prezzo = nuovoPrezzo;
+            }
 
+            // Effettuiamo la richiesta POST al backend per modificare la prenotazione
+            fetch('/modifica_prenotazione', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Prenotazione modificata con successo!');
+                        // Aggiorniamo la tabella delle prenotazioni visualizzate
+                        if (document.getElementById('visualizzaPrenotazioniFrattamaggiore').style.display === 'block') {
+                            visualizzaPrenotazioniFrattamaggiore();
+                        } else if (document.getElementById('visualizzaPrenotazioniAversa').style.display === 'block') {
+                            visualizzaPrenotazioniAversa();
+                        }
+                    } else {
+                        throw new Error('Si è verificato un problema durante la modifica della prenotazione.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Errore durante la modifica della prenotazione:', error);
+                    alert('Si è verificato un errore durante la modifica della prenotazione.');
+                });
+        } else {
+            alert('Devi fornire almeno una nuova descrizione o un nuovo prezzo per modificare la prenotazione.');
+        }
+    }
     function eliminaPrenotazione(id, cliente, descrizione) {
         if (confirm(`Sei sicuro di voler eliminare la prenotazione per ${cliente}?`)) {
             fetch('/elimina_prenotazione', {
