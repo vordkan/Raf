@@ -20,11 +20,10 @@ app = Flask(__name__,  static_folder='static')
 def create_connection():
     try:
         conn = mysql.connector.connect(
-            host="127.0.0.1",
-            user="root",
-            password="password",
-            port = "3307",
-            database="raffaele",
+            host="MattSenn.mysql.pythonanywhere-services.com",
+            user="MattSenn",
+            password="Prova.123",
+            database="MattSenn$default",
         )
         print("Connessione al database avvenuta con successo!")
         return conn
@@ -423,28 +422,39 @@ def modifica_prenotazione():
 
 @app.route('/modifica_prenotazione_ora', methods=['POST'])
 def modifica_prenotazione_ora():
-    try:
-        conn = create_connection()
-        cursor = conn.cursor()
+    max_attempts = 3
+    attempts = 0
+    while attempts < max_attempts:
+        try:
+            conn = create_connection()
+            cursor = conn.cursor()
 
-        data = request.json
-        prenotazione_id = data['prenotazione_id']
-        nuova_data_inizio = data.get('nuova_data_inizio')
-        nuova_data_fine = data.get('nuova_data_fine')
+            data = request.json
+            prenotazione_id = data.get('prenotazione_id')
+            nuova_data_inizio = data.get('nuova_data_inizio')
+            nuova_data_fine = data.get('nuova_data_fine')
 
-        if nuova_data_inizio is not None and nuova_data_fine is not None:
-            query = "UPDATE prenotazione SET data_inizio = %s, data_fine = %s WHERE id = %s"
-            params = (nuova_data_inizio, nuova_data_fine, prenotazione_id)
-        else:
-            return jsonify({'error': 'Devi fornire sia una nuova data di inizio che una nuova data di fine per modificare la prenotazione.'}), 400
+            if prenotazione_id is None or nuova_data_inizio is None or nuova_data_fine is None:
+                return jsonify({'error': 'Devi fornire prenotazione_id, nuova_data_inizio e nuova_data_fine.'}), 400
 
-        execute_query_with_reconnect(query, params)
-        conn.commit()
-        print("Prenotazione modificata nel database 'raffaele'")
-        return jsonify({'message': 'Prenotazione modificata con successo nel database'}), 200
-    except Exception as e:
-        print(f"Si è verificato un errore durante la modifica della prenotazione nel database: {e}")
-        return jsonify({'error': 'Si è verificato un errore durante la modifica della prenotazione nel database.'}), 500
+            cursor.execute("UPDATE prenotazione SET data_inizio = %s, data_fine = %s WHERE id = %s", (nuova_data_inizio, nuova_data_fine, prenotazione_id))
+            conn.commit()
+
+            cursor.close()
+            conn.close()
+
+            return jsonify({'message': 'Prenotazione modificata con successo nel database'}), 200
+        except Exception as e:
+            print(f"Si è verificato un errore durante la modifica della prenotazione nel database: {e}")
+            return jsonify({'error': 'Si è verificato un errore durante la modifica della prenotazione nel database.'}), 500
+            print(f"Si è verificato un errore durante la modifica della prenotazione nel database: {e}")
+            attempts += 1
+            if attempts >= max_attempts:
+                return jsonify({'error': 'Si è verificato un errore durante la modifica della prenotazione nel database.'}), 500
+            else:
+                # Riconnessione al database
+                conn = create_connection()  # Sostituisci con la funzione appropriata per ottenere una nuova connessione al database
+                cursor = conn.cursor()
 
 
 @app.route('/elimina_prenotazione', methods=['POST'])
@@ -941,6 +951,3 @@ def elimina_merce():
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
-
