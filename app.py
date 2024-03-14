@@ -20,10 +20,10 @@ app = Flask(__name__,  static_folder='static')
 def create_connection():
     try:
         conn = mysql.connector.connect(
-            host="MattSenn.mysql.pythonanywhere-services.com",
-            user="MattSenn",
-            password="Prova.123",
-            database="MattSenn$default",
+            host="localhost",
+            user="matt",
+            password="password",
+            database="raffaele",
         )
         print("Connessione al database avvenuta con successo!")
         return conn
