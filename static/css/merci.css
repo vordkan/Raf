@@ -1,137 +1,130 @@
-/* Stile per il wrapper generale della pagina */
-.page-wrapper {
-    max-width: 800px; /* Larghezza massima del riquadro */
-    margin: 50px auto; /* Centra il riquadro nella pagina e aggiunge spazio sopra */
-    padding: 20px; /* Aggiunge spazio intorno ai contenuti */
-    border: 2px solid #ccc; /* Aggiunge un bordo al riquadro */
-    border-radius: 10px; /* Aggiunge un bordo arrotondato */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Aggiunge un'ombra */
-    background-color: #fff; /* Colore di sfondo */
-}
-
-/* Stile generale per il corpo della pagina */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+/* Reset CSS */
+* {
     margin: 0;
     padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    box-sizing: border-box;
 }
 
-/* Stile per il titolo della pagina */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+}
+
+.page-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
 h1 {
     text-align: center;
-    color: #333; /* Colore del testo modificato */
-}
-
-/* Stile per i form */
-.form-group {
     margin-bottom: 20px;
 }
 
-label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-input[type="text"],
-input[type="datetime-local"],
-input[type="submit"],
-select { /* Aggiunto stile per i menu a tendina */
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-input[type="submit"] {
-    background-color: #c58846;
-    color: #fff;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-input[type="submit"]:hover {
-    background-color: #cb7b2b;
-}
-
-/* Stile per i messaggi di errore */
-.error-message {
-    color: red;
-    margin-bottom: 10px;
-}
-
-/* Stile per il calendario */
-.calendar {
-    margin-top: 50px;
-    text-align: center;
-    overflow-x: auto;
-}
-
-.calendar table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.calendar th,
-.calendar td {
-    padding: 15px; /* Aggiungi spazio tra le colonne */
-    border: 1px solid #ccc;
-}
-
-.calendar th {
-    background-color: #f2f2f2;
-}
-
-/* Stile per i tab */
 .tabs {
-    overflow: hidden;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    display: flex;
+    justify-content: center;
     margin-bottom: 20px;
 }
 
 .tab {
-    float: left;
+    margin: 0 10px;
 }
 
 .tab button {
     background-color: #f2f2f2;
-    float: left;
     border: none;
-    outline: none;
-    cursor: pointer;
     padding: 10px 20px;
-    transition: background-color 0.3s;
-    border-radius: 5px 5px 0 0;
-}
-
-.tab button:hover {
-    background-color: #ddd;
+    cursor: pointer;
 }
 
 .tab button.active {
-    background-color: #ddd; /* Imposta lo sfondo della tab attiva */
+    background-color: #ddd;
 }
 
 .tabcontent {
     display: none;
-    padding: 20px;
-    border-top: none;
-    clear: both;
 }
 
-/* Stile per il messaggio di successo */
-#addMessage {
-    display: none; /* Inizialmente nascosto */
-    background-color: #d4edda; /* Colore di sfondo verde */
-    color: #155724; /* Colore del testo verde scuro */
-    padding: 10px; /* Spazio interno */
-    border-radius: 5px; /* Bordo arrotondato */
-    margin-top: 10px; /* Spazio sopra il messaggio */
-    text-align: center; /* Testo centrato */
+/* Form styles */
+.form-group {
+    margin-bottom: 10px;
 }
+
+label {
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="number"],
+textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-top: 5px;
+}
+
+input[type="submit"] {
+    background-color: #4caf50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+/* Table styles */
+.table-container {
+    overflow-x: auto;
+}
+
+#merceTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+#merceTable th,
+#merceTable td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+#merceTable th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+#merceTable tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+#merceTable tbody tr:hover {
+    background-color: #f2f2f2;
+}
+
+#merceTable td button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+#merceTable td button:hover {
+    color: red;
+}
+
+/* Message styles */
+.message {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 4px;
+    display: none;
+}
+
