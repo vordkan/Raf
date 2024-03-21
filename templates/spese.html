@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Spese</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="#aggiungiSpesa">Aggiungi Spesa</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#prezzoTotale">Prezzo Totale</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#visualizzaSpese">Visualizza Spese</a>
+        </li>
+    </ul>
+
+    <div class="tab-content mt-3">
+        <div class="tab-pane fade show active" id="aggiungiSpesa">
+            <h2>Aggiungi Spesa</h2>
+            <form id="aggiungiSpesaForm">
+                <label for="nome">Nome Spesa:</label>
+                <input type="text" id="nome" name="nome"><br><br>
+                <label for="prezzo">Prezzo:</label>
+                <input type="number" id="prezzo" name="prezzo" step="0.01"><br><br>
+                <button type="submit" class="btn btn-primary btn-aggiungi-spesa" style="background-color: #C58846FF; border-color: #cb7b2b;">Aggiungi Spesa</button>
+            </form>
+        </div>
+
+        <div class="tab-pane fade" id="prezzoTotale">
+            <h2>Prezzo Totale</h2>
+            <div id="prezzoTotaleResult"></div>
+        </div>
+
+        <div class="tab-pane fade" id="visualizzaSpese">
+            <h2>Spese della giornata</h2>
+            <div id="speseGiornata"></div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script>
+    $(document).ready(function(){
+        // Aggiungi Spesa
+        $('#aggiungiSpesaForm').submit(function(e){
+            e.preventDefault();
+            var formData = $(this).serialize();
+            $.ajax({
+                url: '/aggiungi_spesa',
+                type: 'POST',
+                data: formData,
+                success: function(){
+                    alert("Inserimento avvenuto con successo");
+                    window.location.reload();
+                },
+                error: function(xhr, status, error){
+                    alert('Errore durante l\'aggiunta della spesa');
+                }
+            });
+        });
+    });
+
+    // Visualizza Prezzo Totale
+    $.get('/guadagno_tot', function(response){
+        $('#prezzoTotaleResult').html(response);
+    }).fail(function(){
+        alert('Errore durante il calcolo del prezzo totale');
+    });
+
+    // Visualizza Spese della Giornata
+    $.get('/spese_giornata', function(response){
+        $('#speseGiornata').html(response);
+    }).fail(function(){
+        alert('Errore durante il recupero delle spese della giornata');
+    });
+
+</script>
+</body>
+</html>

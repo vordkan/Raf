@@ -25,3 +25,11 @@ CREATE TABLE merci(
     data_carico TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     data_scarico TIMESTAMP
 );
+
+CREATE TABLE spese(
+    Id int not null AUTO_INCREMENT,
+    nome varchar(50),
+    prezzo double,
+    data date,
+    primary key (id)
+);

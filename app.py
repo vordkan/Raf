@@ -71,6 +71,11 @@ def fatturato():
 def merce():
     return render_template('merci.html')
 
+# Spese
+@app.route('/spese')
+def spese():
+    return render_template('spese.html')
+
 #---------------------------------------------------------------------------------------------------------------------#
 @app.route('/submit', methods=['POST'])
 def submit():
@@ -803,8 +808,93 @@ def get_schedule():
 
     print(f"Numero massimo di tentativi raggiunto ({max_attempts}). Impossibile stabilire la connessione al database.")
     return jsonify({'error': 'Impossibile stabilire la connessione al database.'}), 500
+#---------------------------------------------------------------------------------------------------------------------#
+@app.route('/aggiungi_spesa', methods=['POST'])
+def aggiungi_spese():
+    nome = request.form['nome']
+    prezzo = request.form['prezzo']
+    data = datetime.now().strftime('%Y-%m-%d')
+
+    attempts = 0
+    max_attempts = 3
+    wait_time_seconds = 5
+
+    while attempts < max_attempts:
+        try:
+            conn = create_connection()
+            if conn:
+                cursor = conn.cursor()
+                cursor.execute("INSERT INTO spese (nome, prezzo, data) VALUES (%s, %s, %s)", (nome, prezzo, data))
+                conn.commit()
+                return redirect(url_for('index'))
+        except Exception as e:
+            print(f"Tentativo di connessione fallito. Riprovo tra {wait_time_seconds} secondi...")
+            print(f"Errore: {e}")
+            time.sleep(wait_time_seconds)
+            attempts += 1
+        finally:
+            if conn:
+                conn.close()
+    return "Si è verificato un errore durante l'aggiunta della spesa."
 
 
+@app.route('/guadagno_tot')
+def guadagno_tot():
+    attempts = 0
+    max_attempts = 3
+    wait_time_seconds = 5
+    while attempts < max_attempts:
+        try:
+            conn = create_connection()
+            if conn:
+                cursor = conn.cursor()
+                data = datetime.now().strftime('%Y-%m-%d')
+
+                # Prendo il totale delle spese della giornata
+                cursor.execute("SELECT SUM(prezzo) FROM spese WHERE data = %s", (data,))
+                tot_spese = cursor.fetchone()[0]
+
+                # Prendo il totale guadagnato in giornata
+                cursor.execute("SELECT SUM(prezzo) FROM prenotazione WHERE DATE(data_inizio) = %s", (data,))
+                tot_guadagno = cursor.fetchone()[0]
+
+                tot = tot_guadagno - tot_spese
+                return f"Il guadagno totale per oggi è: {tot}"
+        except Exception as e:
+            print(f"Tentativo di connessione fallito. Riprovo tra {wait_time_seconds} secondi...")
+            print(f"Errore: {e}")
+            time.sleep(wait_time_seconds)
+            attempts += 1
+        finally:
+            if conn:
+                conn.close()
+    return "Si è verificato un errore durante il calcolo della somma giornaliera delle spese."
+
+@app.route('/spese_giornata')
+def spese_giornata():
+    try:
+        conn = create_connection()
+        if conn:
+            cursor = conn.cursor()
+            data = datetime.now().strftime('%Y-%m-%d')
+
+            # Seleziona tutte le spese della giornata
+            cursor.execute("SELECT nome, prezzo FROM spese WHERE data = %s", (data,))
+            spese = cursor.fetchall()
+
+            # Formatta le spese come HTML per essere visualizzate
+            result = "<ul>"
+            for spesa in spese:
+                result += f"<li>{spesa[0]}: {spesa[1]}</li>"
+            result += "</ul>"
+
+            return result
+    except Exception as e:
+        print(f"Errore durante il recupero delle spese della giornata: {e}")
+    finally:
+        if conn:
+            conn.close()
+    return jsonify({"error": "Errore durante il recupero delle spese della giornata"})
 #---------------------------------------------------------------------------------------------------------------------#
 @app.route('/carica_merce', methods=['POST'])
 def carica_merce():
