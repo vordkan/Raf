@@ -67,7 +67,7 @@ textarea {
 }
 
 input[type="submit"] {
-    background-color: #4caf50;
+    background-color: #C58846FF;
     color: white;
     padding: 10px 20px;
     border: none;
@@ -76,7 +76,7 @@ input[type="submit"] {
 }
 
 input[type="submit"]:hover {
-    background-color: #45a049;
+    background-color: #CB7B2BFF;
 }
 
 /* Table styles */

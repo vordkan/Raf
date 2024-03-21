@@ -148,6 +148,31 @@
         }
     }
 
+    function aggiungi(idMerce) {
+        if (confirm("Sei sicuro di voler aggiungere questa prodotto?")) {
+            fetch('/aggiungi', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({id_merce: idMerce})
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Errore durante l\'aggiunta della merce');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(data);
+                    visualizzaMerce();
+                })
+                .catch(error => {
+                    console.error('Errore durante l\'aggiunta della merce:', error);
+                });
+        }
+    }
+
     function visualizzaMerce() {
         fetch('/visualizza_merce')
             .then(response => {
@@ -171,7 +196,10 @@
                     <td>${merce[3]}</td>
                     <td>${merce[4]}</td>
                     <td>${dataCarico}</td>
-                    <td><button onclick="eliminaMerce('${merce[0]}')">🗑</button></td>
+                    <td>
+                        <button onclick="eliminaMerce('${merce[0]}')">🗑</button>
+                        <button onclick="aggiungi('${merce[0]}')">➕</button>
+                    </td>
                 `;
                     tableBody.appendChild(row);
                 });
@@ -204,8 +232,8 @@ document.getElementById('addForm').addEventListener('submit', function(event) {
                 document.getElementById('addMessage').style.display = 'block';
                 setTimeout(() => {
                     document.getElementById('addMessage').style.display = 'none';
-                }, 3000); // Nasconde il messaggio dopo 3 secondi
-                this.reset(); // Resetta il form
+                }, 3000);
+                this.reset();
             } else {
                 console.error('Errore durante l\'aggiunta della merce:', data.error);
             }
@@ -235,8 +263,8 @@ document.getElementById('deleteForm').addEventListener('submit', function(event)
                 document.getElementById('deleteMessage').style.display = 'block';
                 setTimeout(() => {
                     document.getElementById('deleteMessage').style.display = 'none';
-                }, 3000); // Nasconde il messaggio dopo 3 secondi
-                this.reset(); // Resetta il form
+                }, 3000);
+                this.reset();
             } else {
                 console.error('Errore durante lo scarico della merce:', data.error);
             }

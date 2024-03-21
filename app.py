@@ -21,7 +21,8 @@ def create_connection():
     try:
         conn = mysql.connector.connect(
             host="localhost",
-            user="matt",
+            user="root",
+            port="3307",
             password="password",
             database="raffaele",
         )
@@ -936,6 +937,37 @@ def elimina_merce():
                 cursor.execute("DELETE FROM merci WHERE ID = %s", (id_merce,))
                 conn.commit()
                 return jsonify({'success': True, 'message': 'Merce eliminata con successo!'})
+        except Exception as e:
+            print(f"Tentativo di connessione fallito. Riprovo tra {wait_time_seconds} secondi...")
+            print(f"Errore: {e}")
+            time.sleep(wait_time_seconds)
+            attempts += 1
+        finally:
+            if conn:
+                conn.close()
+
+    print(f"Numero massimo di tentativi raggiunto ({max_attempts}). Impossibile stabilire la connessione al database.")
+    return jsonify({'success': False, 'error': "Impossibile stabilire la connessione al database."})
+
+@app.route('/aggiungi', methods=['POST'])
+def aggiungi():
+    attempts = 0
+    max_attempts = 3
+    wait_time_seconds = 5
+
+    while attempts < max_attempts:
+        try:
+            conn = create_connection()
+            if conn:
+                cursor = conn.cursor()
+
+                id_merce = request.json['id_merce']
+                cursor.execute("SELECT quantita FROM merci WHERE ID = %s", (id_merce,))
+                current_quantity = cursor.fetchone()[0]
+                new_quantity = current_quantity + 1
+                cursor.execute("UPDATE merci SET quantita = %s WHERE ID = %s", (new_quantity, id_merce))
+                conn.commit()
+                return jsonify({'success': True, 'message': 'Quantità incrementata con successo!'})
         except Exception as e:
             print(f"Tentativo di connessione fallito. Riprovo tra {wait_time_seconds} secondi...")
             print(f"Errore: {e}")
