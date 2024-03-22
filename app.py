@@ -46,23 +46,14 @@ else:
 def index():
     return render_template('login.html')
 
-# Carica gli utenti dal file JSON
-try:
-    with open('utenti.json') as f:
-        utenti = json.load(f)['utenti']
-except FileNotFoundError:
-    print("Il file JSON degli utenti non è stato trovato.")
-    utenti = []
-
 # Pagina login
 @app.route('/login', methods=['POST'])
 def login():
     username = request.form['username']
     password = request.form['password']
 
-    for utente in utenti:
-        if utente['username'] == username and utente['password'] == password:
-            return render_template('index.html')
+    if username == 'admin' and password == 'admin':
+        return render_template('index.html')
 
     return jsonify({"success": False, "message": "Credenziali non valide"})
 
@@ -684,12 +675,11 @@ def aggiungi_dipendente():
                 cursor = conn.cursor()
                 cursor.execute("INSERT INTO dipendente (nome, sede) VALUES (%s, %s)", (nome, sede))
                 conn.commit()
-                print("Dipendente aggiunto con successo!")
 
                 # Aggiungi il dipendente al file JSON con un colore pastello casuale
                 add_employee_to_json(nome, colore_pastello)
 
-                return redirect(url_for('index'))
+                return render_template("dipendente.html")
         except Exception as e:
             print(f"Tentativo di connessione fallito. Riprovo tra {wait_time_seconds} secondi...")
             print(f"Errore: {e}")
@@ -731,10 +721,9 @@ def elimina_dipendente():
                 conn.commit()
                 print("Dipendente eliminato con successo!")
 
-                # Rimuovi il dipendente anche dal file JSON
                 remove_employee_from_json(dipendente)
 
-                return redirect(url_for('index'))
+                return render_template("dipendente.html")
         except Exception as e:
             print(f"Tentativo di connessione fallito. Riprovo tra {wait_time_seconds} secondi...")
             print(f"Errore: {e}")
@@ -933,7 +922,7 @@ def carica_merce():
                 nome_merce = request.form['nome_merce']
                 descrizione_merce = request.form['descrizione_merce']
                 quantita_merce = int(request.form['quantita_merce'])
-                prezzo_merce = float(request.form['prezzo_merce'])
+                prezzo_merce = 0 #float(request.form['prezzo_merce'])
                 data_carico = datetime.utcnow()
 
                 cursor.execute("INSERT INTO merci (ID, nome, descrizione, quantita, prezzo, data_carico) VALUES (%s, %s, %s, %s, %s, %s)",
@@ -956,6 +945,9 @@ def carica_merce():
 
 
 
+from datetime import datetime
+import time
+
 @app.route('/scarica_merce', methods=['POST'])
 def scarica_merce():
     attempts = 0
@@ -971,6 +963,9 @@ def scarica_merce():
                 id_merce = request.form['id_merceS']
                 quantita_scarico = int(request.form['quantita_scarico'])
 
+                data_scarico = datetime.utcnow()
+                data_scarico_str = data_scarico.strftime('%Y-%m-%d %H:%M:%S')
+
                 # Verifica se la merce esiste
                 cursor.execute("SELECT quantita FROM merci WHERE ID = %s", (id_merce,))
                 result = cursor.fetchone()
@@ -980,7 +975,7 @@ def scarica_merce():
                     if quantita_scarico <= quantita_attuale:
                         # Aggiorna la quantità di merce nel database
                         nuova_quantita = quantita_attuale - quantita_scarico
-                        cursor.execute("UPDATE merci SET quantita = %s WHERE ID = %s", (nuova_quantita, id_merce))
+                        cursor.execute("UPDATE merci SET quantita = %s, data_carico = %s WHERE ID = %s", (nuova_quantita, data_scarico_str, id_merce))
                         conn.commit()
                         # Restituisci un messaggio di successo senza visualizzare una schermata
                         return jsonify({"success": True, "message": "Scarico avvenuto con successo!"}), 200
@@ -1073,10 +1068,15 @@ def aggiungi():
                 cursor = conn.cursor()
 
                 id_merce = request.json['id_merce']
+
+                data_carico = datetime.utcnow()
+                data_carico_str = data_carico.strftime('%Y-%m-%d %H:%M:%S')
+
                 cursor.execute("SELECT quantita FROM merci WHERE ID = %s", (id_merce,))
                 current_quantity = cursor.fetchone()[0]
                 new_quantity = current_quantity + 1
-                cursor.execute("UPDATE merci SET quantita = %s WHERE ID = %s", (new_quantity, id_merce))
+
+                cursor.execute("UPDATE merci SET quantita = %s, data_carico = %s WHERE ID = %s", (new_quantity, data_carico_str, id_merce))
                 conn.commit()
                 return jsonify({'success': True, 'message': 'Quantità incrementata con successo!'})
         except Exception as e:

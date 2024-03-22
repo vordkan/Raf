@@ -36,7 +36,7 @@
             </div>
 
             <div class="form-group">
-                <input type="submit" value="Aggiungi">
+                <input type="submit" value="Aggiungi" onclick="aggiungiDipendenteSuccesso()">
             </div>
         </form>
     </div>
@@ -82,7 +82,7 @@
     function visualizzaDipendenteSelezionato() {
         var dipendenteSelect = document.getElementById("dipendente");
         var dipendenteSelezionato = dipendenteSelect.options[dipendenteSelect.selectedIndex].text;
-        alert("Hai selezionato il dipendente: " + dipendenteSelezionato);
+        alert("Hai eliminato il dipendente: " + dipendenteSelezionato);
     }
 
     function getDipendenti() {
@@ -108,6 +108,10 @@
 
     // Chiamare la funzione per ottenere i dipendenti quando la pagina si carica
     window.onload = getDipendenti;
+
+    function aggiungiDipendenteSuccesso() {
+        alert("Aggiunta dipendente avvenuta con successo");
+    }
 </script>
 
 

@@ -47,10 +47,12 @@
                 <input type="number" id="quantita_merce" name="quantita_merce" required>
             </div>
 
+            <!--
             <div class="form-group">
                 <label for="prezzo_merce">Prezzo:</label>
                 <input type="text" id="prezzo_merce" name="prezzo_merce" required>
             </div>
+            -->
 
             <div class="form-group">
                 <input type="submit" value="Aggiungi">
@@ -89,7 +91,7 @@
                         <th>Nome</th>
                         <th>Descrizione</th>
                         <th>Quantità</th>
-                        <th>Prezzo</th>
+                        <!-- <th>Prezzo</th> -->
                         <th>Data Carico</th>
                         <th>Azioni</th>
                     </tr>
@@ -137,13 +139,11 @@
                     return response.json();
                 })
                 .then(data => {
-                    console.log(data); // Puoi gestire la risposta come desiderato
-                    // Aggiorna la visualizzazione dopo l'eliminazione
+                    console.log(data);
                     visualizzaMerce();
                 })
                 .catch(error => {
                     console.error('Errore durante l\'eliminazione della merce:', error);
-                    // Gestisci l'errore in modo appropriato, ad esempio mostrando un messaggio all'utente
                 });
         }
     }
@@ -194,7 +194,7 @@
                     <td>${merce[1]}</td>
                     <td>${merce[2]}</td>
                     <td>${merce[3]}</td>
-                    <td>${merce[4]}</td>
+                    <!-- <td>${merce[4]}</td> -->
                     <td>${dataCarico}</td>
                     <td>
                         <button onclick="eliminaMerce('${merce[0]}')">🗑</button>
@@ -206,7 +206,6 @@
             })
             .catch(error => {
                 console.error('Errore durante il recupero dei dati:', error);
-                // Gestisci l'errore in modo appropriato, ad esempio mostrando un messaggio all'utente
             });
 
     }
