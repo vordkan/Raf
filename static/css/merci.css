@@ -67,7 +67,7 @@ textarea {
 }
 
 input[type="submit"] {
-    background-color: #C58846FF;
+    background: linear-gradient(135deg, #08181f, #8d8d8d);
     color: white;
     padding: 10px 20px;
     border: none;
@@ -76,7 +76,7 @@ input[type="submit"] {
 }
 
 input[type="submit"]:hover {
-    background-color: #CB7B2BFF;
+    background: linear-gradient(135deg, #8d8d8d, #08181f);
 }
 
 /* Table styles */

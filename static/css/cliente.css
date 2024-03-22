@@ -1,28 +1,12 @@
-.button-icon {
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-}
-
-
 /* Stile per il wrapper generale della pagina */
 .page-wrapper {
-    max-width: 800px; /* Larghezza massima del riquadro */
+    max-width: 90%; /* Larghezza massima del riquadro */
     margin: 50px auto; /* Centra il riquadro nella pagina e aggiunge spazio sopra */
     padding: 20px; /* Aggiunge spazio intorno ai contenuti */
     border: 2px solid #ccc; /* Aggiunge un bordo al riquadro */
     border-radius: 10px; /* Aggiunge un bordo arrotondato */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Aggiunge un'ombra */
     background-color: #fff; /* Colore di sfondo */
-}
-
-/* Reset CSS per assicurare uniformità tra i browser */
-body, h1, h2, form, label, input, button, table, th, td {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    font-family: Arial, sans-serif;
 }
 
 /* Stile per il titolo principale */
@@ -52,6 +36,7 @@ label {
 }
 
 input[type="text"] {
+    width: 100%;
     padding: 8px;
     border-radius: 4px;
     border: 1px solid #ccc;
@@ -62,13 +47,13 @@ button {
     padding: 10px 20px;
     border: none;
     border-radius: 4px;
-    background-color: #c58846;
+    background: linear-gradient(135deg, #08181f, #8d8d8d);
     color: #fff;
     cursor: pointer;
 }
 
 button:hover {
-    background-color: #cb7b2b;
+    background: linear-gradient(135deg, #8d8d8d, #08181f);
 }
 
 /* Stile per la tabella */

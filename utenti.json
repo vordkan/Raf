@@ -1,0 +1,5 @@
+{
+  "utenti": [
+    {"username": "admin", "password": "admin"}
+  ]
+}

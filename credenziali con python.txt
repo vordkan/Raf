@@ -1,0 +1,22 @@
+# Funzione per ottenere la connessione al database
+def create_connection():
+    try:
+        conn = mysql.connector.connect(
+            host="MattSenn.mysql.pythonanywhere-services.com",
+            user="MattSenn",
+            password="Prova.123",
+            database="MattSenn$default",
+        )
+        print("Connessione al database avvenuta con successo!")
+        return conn
+    except Exception as e:
+        print(f"Si è verificato un errore durante la connessione al database: {e}")
+        return None
+
+# Inizializzazione della connessione e del cursore
+conn = create_connection()
+if conn:
+    cursor = conn.cursor()
+else:
+    # Gestisci il caso in cui non sia possibile ottenere una connessione al database
+    print("Impossibile ottenere una connessione al database.")

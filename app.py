@@ -44,7 +44,28 @@ else:
 # Pagina principale
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('login.html')
+
+# Carica gli utenti dal file JSON
+try:
+    with open('utenti.json') as f:
+        utenti = json.load(f)['utenti']
+except FileNotFoundError:
+    print("Il file JSON degli utenti non è stato trovato.")
+    utenti = []
+
+# Pagina login
+@app.route('/login', methods=['POST'])
+def login():
+    username = request.form['username']
+    password = request.form['password']
+
+    for utente in utenti:
+        if utente['username'] == username and utente['password'] == password:
+            return render_template('index.html')
+
+    return jsonify({"success": False, "message": "Credenziali non valide"})
+
 
 # Pagina delle prenotazioni
 @app.route('/prenotazione')

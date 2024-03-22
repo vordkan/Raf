@@ -1,6 +1,6 @@
 /* Stile per il wrapper generale della pagina */
 .page-wrapper {
-    max-width: 800px; /* Larghezza massima del riquadro */
+    max-width: 90%; /* Larghezza massima del riquadro */
     margin: 50px auto; /* Centra il riquadro nella pagina e aggiunge spazio sopra */
     padding: 20px; /* Aggiunge spazio intorno ai contenuti */
     border: 2px solid #ccc; /* Aggiunge un bordo al riquadro */
@@ -46,17 +46,18 @@ select { /* Aggiunto stile per i menu a tendina */
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    box-sizing: border-box; /* Assicura che il padding non aumenti le dimensioni dell'elemento */
 }
 
 input[type="submit"] {
-    background-color: #c58846;
+    background: linear-gradient(135deg, #08181f, #8d8d8d);
     color: #fff;
     cursor: pointer;
     transition: background-color 0.3s;
 }
 
 input[type="submit"]:hover {
-    background-color: #cb7b2b;
+    background: linear-gradient(135deg, #8d8d8d, #08181f);
 }
 
 /* Stile per i messaggi di errore */
