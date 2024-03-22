@@ -1,6 +1,6 @@
 /* Stile per il wrapper generale della pagina */
 .page-wrapper {
-    max-width: 90%; /* Larghezza massima del riquadro */
+    max-width: 50%; /* Aumenta la larghezza massima del riquadro */
     margin: 50px auto; /* Centra il riquadro nella pagina e aggiunge spazio sopra */
     padding: 20px; /* Aggiunge spazio intorno ai contenuti */
     border: 2px solid #ccc; /* Aggiunge un bordo al riquadro */
@@ -27,16 +27,19 @@ h2 {
 /* Stile per il form di input */
 form {
     margin-bottom: 20px;
+    display: flex; /* Usa il layout flessibile per allineare gli elementi */
+    flex-wrap: wrap; /* Permette al form di avvolgere i suoi elementi quando non ci sono spazi sufficienti */
 }
 
 /* Stile per il campo di input */
 label {
     display: block;
     margin-bottom: 5px;
+    width: 100%; /* Occupa tutta la larghezza del suo container */
 }
 
 input[type="text"] {
-    width: 100%;
+    width: calc(100% - 120px); /* Larghezza calcolata meno il padding del pulsante */
     padding: 8px;
     border-radius: 4px;
     border: 1px solid #ccc;
@@ -44,22 +47,19 @@ input[type="text"] {
 
 /* Stile per il pulsante di invio del form */
 button {
-    padding: 10px 20px;
+    padding: 6px 12px; /* Riduci il padding del pulsante per adattarlo meglio agli altri elementi */
     border: none;
     border-radius: 4px;
-    background: linear-gradient(135deg, #08181f, #8d8d8d);
-    color: #fff;
     cursor: pointer;
-}
-
-button:hover {
-    background: linear-gradient(135deg, #8d8d8d, #08181f);
+    flex: 0 0 auto; /* Imposta la dimensione del pulsante in base al suo contenuto */
+    margin-left: 10px; /* Aggiunge un margine a sinistra per separare il pulsante dal campo di input */
 }
 
 /* Stile per la tabella */
 table {
-    width: 100%;
+    width: 30%;
     border-collapse: collapse;
+
 }
 
 /* Stile per l'intestazione della tabella */
@@ -73,9 +73,27 @@ th {
 td {
     padding: 10px;
     border: 1px solid #ddd;
+    white-space: nowrap; /* Impedisce al testo di andare a capo */
+    overflow: auto; /* Abilita lo scorrimento orizzontale se il contenuto è troppo largo */
 }
+
 
 /* Stile per le righe dispari della tabella */
 tbody tr:nth-child(odd) {
     background-color: #f9f9f9;
+}
+
+/* Media query per dispositivi mobili */
+@media screen and (max-width: 600px) {
+    .page-wrapper {
+        max-width: 100%; /* Larghezza massima del riquadro su dispositivi mobili */
+    }
+    input[type="text"] {
+        width: 100%; /* Larghezza completa per il campo di input su dispositivi mobili */
+    }
+    button {
+        width: 100%; /* Larghezza completa per il pulsante su dispositivi mobili */
+        margin-left: 0; /* Rimuovi il margine a sinistra per allineare il pulsante al centro */
+        margin-top: 10px; /* Aggiungi un margine superiore per separare il pulsante dall'input */
+    }
 }

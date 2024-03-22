@@ -5,48 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Storico Prenotazioni</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente.css') }}">
+    <!-- Aggiungi Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
 <div class="page-wrapper">
     <h1>Storico Prenotazioni</h1>
     <form action="/storico_prenotazioni" method="post">
         <label for="cliente">Inserisci il nome del cliente:</label>
-        <input type="text" id="cliente" name="cliente" required>
-        <button type="submit">Visualizza Storico Prenotazioni</button>
+        <input type="text" id="cliente" name="cliente" required> <br><br>
+        <button type="submit" style="background: linear-gradient(135deg, #08181f, #8d8d8d); color: white;">Visualizza Storico Prenotazioni</button>
+
     </form>
 
     {% if storico_prenotazioni %}
     <div class="storico">
         <h2>Storico Prenotazioni per il cliente {{ cliente }}</h2>
-        <table>
-            <thead>
-            <tr>
-                <th>Dipendente</th>
-                <th>Descrizione</th>
-                <th>Data</th>
-                <th>Prezzo</th>
-                <th>Sede</th>
-                <th>Modifiche</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for prenotazione in storico_prenotazioni %}
-            <tr>
-                <td>{{ prenotazione[0] }}</td>
-                <td>{{ prenotazione[2] }}</td>
-                <td>{{ prenotazione[3] }}</td>
-                <td>{{ prenotazione[4] }}</td>
-                <td>{{ prenotazione[5] }}</td>
+        <!-- Aggiungi classe "table-responsive" per rendere la tabella responsive -->
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Dipendente</th>
+                    <th>Descrizione</th>
+                    <th>Data</th>
+                    <th>Prezzo</th>
+                    <th>Sede</th>
+                    <th>Modifiche</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for prenotazione in storico_prenotazioni %}
+                <tr>
+                    <td>{{ prenotazione[0] }}</td>
+                    <td>{{ prenotazione[2] }}</td>
+                    <td>{{ prenotazione[3] }}</td>
+                    <td>{{ prenotazione[4] }}</td>
+                    <td>{{ prenotazione[5] }}</td>
 
-                <td>
-                    <button class="button-icon" onclick="modificaPrenotazione('{{ prenotazione[6] }}')">📝</button>
-                    <button class="button-icon" onclick="modificaPrenotazione_ora('{{ prenotazione[6] }}')">🕒</button>
-                    <button class="button-icon" onclick="eliminaPrenotazione('{{ prenotazione[6] }}')">❌</button>
-                </td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+                    <td>
+                        <button class="btn btn-sm btn-icon" onclick="modificaPrenotazione('{{ prenotazione[6] }}')">📝</button>
+                        <button class="btn btn-sm btn-icon" onclick="modificaPrenotazione_ora('{{ prenotazione[6] }}')">🕒</button>
+                        <button class="btn btn-sm btn-icon" onclick="eliminaPrenotazione('{{ prenotazione[6] }}')">❌</button>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
     {% endif %}
 </div>

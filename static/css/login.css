@@ -53,11 +53,11 @@ body {
 
 form {
     background-color: rgba(255, 255, 255, 0.5);
-    padding: 30px; /* Utilizzo di pixel invece di vw */
+    padding: 30px;
     border-radius: 10px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1); /* Modifica delle dimensioni dell'ombra per una migliore visibilità */
-    width: 90%; /* Utilizzo di percentuali per adattarsi alle dimensioni dello schermo */
-    max-width: 400px; /* Limita la larghezza massima per una migliore leggibilità su schermi grandi */
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 400px;
 }
 
 input[type="text"],
@@ -106,6 +106,6 @@ p {
 @media only screen and (min-width: 768px) {
     /* Regole CSS per schermi di dimensioni maggiori, ad esempio tablet o desktop */
     form {
-        max-width: 50%; /* Limita la larghezza massima a 50% del viewport */
+        max-width: 20%;
     }
 }
