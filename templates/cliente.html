@@ -11,13 +11,16 @@
 <body>
 <div class="page-wrapper">
     <h1>Storico Prenotazioni</h1>
+    <h3>Nuovi clienti mensili Fratta: <span id="nuovi_clienti_mensili_fratta"></span></h3>
+    <h3>Nuovi clienti mensili Aversa: <span id="nuovi_clienti_mensili_aversa"></span></h3>
+
     <form action="/storico_prenotazioni" method="post">
         <label for="cliente">Inserisci il nome del cliente:</label>
         <input type="text" id="cliente" name="cliente" required> <br><br>
         <button type="submit" style="background: linear-gradient(135deg, #08181f, #8d8d8d); color: white;">Visualizza Storico Prenotazioni</button>
-
     </form>
 
+    <!-- Restituisce lo storico delle prenotazioni -->
     {% if storico_prenotazioni %}
     <div class="storico">
         <h2>Storico Prenotazioni per il cliente {{ cliente }}</h2>
@@ -58,6 +61,27 @@
 </div>
 
 <script>
+
+    // Funzione per ottenere e visualizzare il numero di nuovi clienti mensili di fratta e aversa
+        function getNuoviClientiMensili() {
+        fetch('/count_nuovi_clienti_fratta')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('nuovi_clienti_mensili_fratta').innerText = data;
+            })
+            .catch(error => console.error('Errore durante il recupero del numero di nuovi clienti mensili (Fratta):', error));
+
+        fetch('/count_nuovi_clienti_aversa')
+        .then(response => response.text())
+        .then(data => {
+        document.getElementById('nuovi_clienti_mensili_aversa').innerText = data;
+    })
+        .catch(error => console.error('Errore durante il recupero del numero di nuovi clienti mensili (Aversa):', error));
+    }
+
+        // Chiama la funzione al caricamento della pagina
+        window.onload = getNuoviClientiMensili();
+
 
     function eliminaPrenotazione(id) {
         if (confirm('Sei sicuro di voler eliminare questa prenotazione?')) {
@@ -150,8 +174,8 @@
         }
     }
 
-
-
 </script>
+
+
 </body>
 </html>
