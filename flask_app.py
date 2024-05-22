@@ -19,17 +19,17 @@ app = Flask(__name__,  static_folder='static')
 def create_connection():
     try:
         conn = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            port="3307",
-            password="password",
-            database="raffaele",
+            host="volpicelliparrucchiere.mysql.pythonanywhere-services.com",
+            user="volpicelliparruc",
+            password="MattGa28.",
+            database="volpicelliparruc$default",
         )
         print("Connessione al database avvenuta con successo!")
         return conn
     except Exception as e:
         print(f"Si è verificato un errore durante la connessione al database: {e}")
         return None
+
 
 # Inizializzazione della connessione e del cursore
 conn = create_connection()
@@ -162,17 +162,17 @@ def submit():
         prezzo = request.form['prezzo']
 
         # Verifica se il cliente è nuovo
-        cursor.execute('''SELECT * FROM prenotazione WHERE nome = %s AND sede = %s''', (summary, sede,))
-        controllo = cursor.fetchone()
-        print(controllo)
+        #cursor.execute('''SELECT * FROM prenotazione WHERE nome = %s AND sede = %s''', (summary, sede,))
+        #controllo = cursor.fetchone()
+        #print(controllo)
 
         # Se restituisce None, incrementa la variabile corretta
-        if controllo is None:
+        #if controllo is None:
 
-            if sede == "Frattamaggiore":
-                incrementa_contatore_fratta()
-            if sede == "Aversa":
-                incrementa_contatore_aversa()
+        #    if sede == "Frattamaggiore":
+        #        incrementa_contatore_fratta()
+        #    if sede == "Aversa":
+        #        incrementa_contatore_aversa()
 
         # Inserimento dei dati nella tabella prenotazione
         cursor.execute('''INSERT INTO prenotazione (nome, descrizione, dipendente, sede, data_inizio, data_fine, prezzo) VALUES (%s, %s, %s, %s, %s, %s, %s)''',
@@ -212,7 +212,7 @@ def get_daily_schedule(max_attempts=3):
 
             current_date = datetime.now().date()
 
-            cursor.execute("SELECT id, HOUR(data_inizio), HOUR(data_fine), dipendente, nome, descrizione FROM prenotazione WHERE DATE(data_inizio) = %s AND sede = 'Frattamaggiore'", (current_date,))
+            cursor.execute("SELECT id, HOUR(data_inizio), MINUTE(data_inizio), HOUR(data_fine), MINUTE(data_fine), dipendente, nome, descrizione FROM prenotazione WHERE DATE(data_inizio) = %s AND sede = 'Frattamaggiore'", (current_date,))
             prenotazioni = cursor.fetchall()
 
             # Ottieni la lista dei dipendenti
@@ -224,13 +224,37 @@ def get_daily_schedule(max_attempts=3):
             for prenotazione in prenotazioni:
                 prenotazione_id = prenotazione[0]  # ID della prenotazione
                 ora_inizio = prenotazione[1]
-                ora_fine = prenotazione[2]
-                dipendente = prenotazione[3]
-                cliente = prenotazione[4]
-                descrizione = prenotazione[5]
+                minuto_inizio = prenotazione[2]
+                ora_fine = prenotazione[3]
+                minuto_fine = prenotazione[4]
+                dipendente = prenotazione[5]
+                cliente = prenotazione[6]
+                descrizione = prenotazione[7]
 
-                for ora in range(ora_inizio, ora_fine + 1):
-                    ora_str = str(ora).zfill(2)
+                # Calcola l'ora di inizio e fine effettiva per garantire che sia un multiplo di 30 minuti
+                start_hour = ora_inizio
+                start_minute = minuto_inizio
+                end_hour = ora_fine
+                end_minute = minuto_fine
+
+                # Arrotonda l'ora di inizio verso il basso al multiplo di 30 minuti più vicino
+                if start_minute < 30:
+                    start_minute = 0
+                else:
+                    start_minute = 30
+
+                # Arrotonda l'ora di fine verso l'alto al multiplo di 30 minuti più vicino
+                if end_minute > 30:
+                    end_minute = 0
+                    end_hour += 1
+                elif end_minute != 0:
+                    end_minute = 30
+
+                # Itera su tutti gli intervalli di 30 minuti all'interno della prenotazione
+                current_hour = start_hour
+                current_minute = start_minute
+                while current_hour < end_hour or (current_hour == end_hour and current_minute <= end_minute):
+                    ora_str = f"{str(current_hour).zfill(2)}:{str(current_minute).zfill(2)}"
 
                     if ora_str not in daily_schedule:
                         daily_schedule[ora_str] = {}
@@ -240,6 +264,13 @@ def get_daily_schedule(max_attempts=3):
 
                     daily_schedule[ora_str][dipendente].append({'id': prenotazione_id, 'cliente': cliente.lower(), 'descrizione': descrizione.lower()})
 
+                    # Incrementa di 30 minuti
+                    if current_minute == 0:
+                        current_minute = 30
+                    else:
+                        current_minute = 0
+                        current_hour += 1
+
             html_table = '<table border="1"><tr><th>Ora</th>'
             for dipendente in employees:
                 # Usa i colori caricati dal file JSON per i dipendenti
@@ -247,9 +278,12 @@ def get_daily_schedule(max_attempts=3):
                 html_table += f'<th style="background-color: {employee_color}">{dipendente}</th>'
             html_table += '</tr>'
 
-            for ora in range(7, 23):
-                ora_str = str(ora).zfill(2)
-                html_table += f'<tr><td>{ora_str}:00</td>'
+            # Genera le righe per ogni intervallo di 30 minuti
+            current_hour = 8
+            current_minute = 0
+            while current_hour < 21 or (current_hour == 21 and current_minute == 0):
+                ora_str = f"{str(current_hour).zfill(2)}:{str(current_minute).zfill(2)}"
+                html_table += f'<tr><td>{ora_str}</td>'
                 for dipendente in employees:
                     prenotazioni = daily_schedule.get(ora_str, {}).get(dipendente, [])
                     cell_content = ''
@@ -268,6 +302,13 @@ def get_daily_schedule(max_attempts=3):
 
                     html_table += f'<td>{cell_content}</td>'
                 html_table += '</tr>'
+
+                # Incrementa di 30 minuti
+                if current_minute == 0:
+                    current_minute = 30
+                else:
+                    current_minute = 0
+                    current_hour += 1
 
             return html_table
         except Exception as e:
@@ -281,6 +322,7 @@ def get_daily_schedule(max_attempts=3):
                 conn = create_connection()
                 cursor = conn.cursor()
 
+
 @app.route('/get_daily_schedule_aversa')
 def get_daily_schedule_aversa(max_attempts=3):
     attempts = 0
@@ -290,7 +332,7 @@ def get_daily_schedule_aversa(max_attempts=3):
 
             current_date = datetime.now().date()
 
-            cursor.execute("SELECT id, HOUR(data_inizio), HOUR(data_fine), dipendente, nome, descrizione FROM prenotazione WHERE DATE(data_inizio) = %s AND sede = 'Aversa'", (current_date,))
+            cursor.execute("SELECT id, HOUR(data_inizio), MINUTE(data_inizio), HOUR(data_fine), MINUTE(data_fine), dipendente, nome, descrizione FROM prenotazione WHERE DATE(data_inizio) = %s AND sede = 'Aversa'", (current_date,))
             prenotazioni = cursor.fetchall()
 
             # Ottieni la lista dei dipendenti
@@ -302,13 +344,37 @@ def get_daily_schedule_aversa(max_attempts=3):
             for prenotazione in prenotazioni:
                 prenotazione_id = prenotazione[0]  # ID della prenotazione
                 ora_inizio = prenotazione[1]
-                ora_fine = prenotazione[2]
-                dipendente = prenotazione[3]
-                cliente = prenotazione[4]
-                descrizione = prenotazione[5]
+                minuto_inizio = prenotazione[2]
+                ora_fine = prenotazione[3]
+                minuto_fine = prenotazione[4]
+                dipendente = prenotazione[5]
+                cliente = prenotazione[6]
+                descrizione = prenotazione[7]
 
-                for ora in range(ora_inizio, ora_fine + 1):
-                    ora_str = str(ora).zfill(2)
+                # Calcola l'ora di inizio e fine effettiva per garantire che sia un multiplo di 30 minuti
+                start_hour = ora_inizio
+                start_minute = minuto_inizio
+                end_hour = ora_fine
+                end_minute = minuto_fine
+
+                # Arrotonda l'ora di inizio verso il basso al multiplo di 30 minuti più vicino
+                if start_minute < 30:
+                    start_minute = 0
+                else:
+                    start_minute = 30
+
+                # Arrotonda l'ora di fine verso l'alto al multiplo di 30 minuti più vicino
+                if end_minute > 30:
+                    end_minute = 0
+                    end_hour += 1
+                elif end_minute != 0:
+                    end_minute = 30
+
+                # Itera su tutti gli intervalli di 30 minuti all'interno della prenotazione
+                current_hour = start_hour
+                current_minute = start_minute
+                while current_hour < end_hour or (current_hour == end_hour and current_minute <= end_minute):
+                    ora_str = f"{str(current_hour).zfill(2)}:{str(current_minute).zfill(2)}"
 
                     if ora_str not in daily_schedule:
                         daily_schedule[ora_str] = {}
@@ -318,6 +384,13 @@ def get_daily_schedule_aversa(max_attempts=3):
 
                     daily_schedule[ora_str][dipendente].append({'id': prenotazione_id, 'cliente': cliente.lower(), 'descrizione': descrizione.lower()})
 
+                    # Incrementa di 30 minuti
+                    if current_minute == 0:
+                        current_minute = 30
+                    else:
+                        current_minute = 0
+                        current_hour += 1
+
             html_table = '<table border="1"><tr><th>Ora</th>'
             for dipendente in employees:
                 # Usa i colori caricati dal file JSON per i dipendenti
@@ -325,9 +398,12 @@ def get_daily_schedule_aversa(max_attempts=3):
                 html_table += f'<th style="background-color: {employee_color}">{dipendente}</th>'
             html_table += '</tr>'
 
-            for ora in range(7, 23):
-                ora_str = str(ora).zfill(2)
-                html_table += f'<tr><td>{ora_str}:00</td>'
+            # Genera le righe per ogni intervallo di 30 minuti
+            current_hour = 8
+            current_minute = 0
+            while current_hour < 21 or (current_hour == 21 and current_minute == 0):
+                ora_str = f"{str(current_hour).zfill(2)}:{str(current_minute).zfill(2)}"
+                html_table += f'<tr><td>{ora_str}</td>'
                 for dipendente in employees:
                     prenotazioni = daily_schedule.get(ora_str, {}).get(dipendente, [])
                     cell_content = ''
@@ -347,6 +423,13 @@ def get_daily_schedule_aversa(max_attempts=3):
                     html_table += f'<td>{cell_content}</td>'
                 html_table += '</tr>'
 
+                # Incrementa di 30 minuti
+                if current_minute == 0:
+                    current_minute = 30
+                else:
+                    current_minute = 0
+                    current_hour += 1
+
             return html_table
         except Exception as e:
             # Gestisci l'errore di disconnessione riconnettendoti al server MySQL e riprova l'operazione
@@ -356,13 +439,12 @@ def get_daily_schedule_aversa(max_attempts=3):
                 return jsonify({'success': False, 'error': str(e)})
             else:
                 # Riconnessione al database
-                conn = create_connection()  # Sostituisci con la funzione appropriata per ottenere una nuova connessione al database
+                conn = create_connection()
                 cursor = conn.cursor()
 
 
 @app.route('/get_weekly_schedule', methods=['POST'])
-def get_weekly_schedule():
-    max_attempts = 3
+def get_weekly_schedule(max_attempts=3):
     attempts = 0
     while attempts < max_attempts:
         try:
@@ -374,30 +456,56 @@ def get_weekly_schedule():
             current_sede = request_data.get('sede')
 
             if current_date_str is None or current_sede is None:
-                return "Seleziona una data e una sede"
+                return jsonify({'success': False, 'error': 'Seleziona una data e una sede'})
 
-            try:
-                current_date = datetime.strptime(current_date_str, '%Y-%m-%d').date()
-            except ValueError:
-                return "Seleziona una data e una sede"
+            current_date = datetime.strptime(current_date_str, '%Y-%m-%d').date()
 
-            if current_sede.lower() == 'aversa':
-                cursor.execute("SELECT id, HOUR(data_inizio), HOUR(data_fine), dipendente, nome, descrizione FROM prenotazione WHERE DATE(data_inizio) = %s AND sede = 'Aversa'", (current_date,))
-            else:
-                cursor.execute("SELECT id, HOUR(data_inizio), HOUR(data_fine), dipendente, nome, descrizione FROM prenotazione WHERE DATE(data_inizio) = %s AND sede = 'Frattamaggiore'", (current_date,))
-
+            cursor.execute("SELECT id, HOUR(data_inizio), MINUTE(data_inizio), HOUR(data_fine), MINUTE(data_fine), dipendente, nome, descrizione FROM prenotazione WHERE DATE(data_inizio) = %s AND sede = %s", (current_date, current_sede))
             prenotazioni = cursor.fetchall()
 
-            for prenotazione in prenotazioni:
-                prenotazione_id = prenotazione[0]
-                ora_inizio = prenotazione[1]
-                ora_fine = prenotazione[2]
-                dipendente = prenotazione[3]
-                cliente = prenotazione[4]
-                descrizione = prenotazione[5]
+            # Ottieni la lista dei dipendenti
+            if current_sede.lower() == 'aversa':
+                employees = leggi_dipendenti_aversa()
+            else:
+                employees = leggi_dipendenti()  # Aggiungi la funzione per leggere i dipendenti dell'altra sede
 
-                for ora in range(ora_inizio, ora_fine + 1):
-                    ora_str = str(ora).zfill(2)
+            # Leggi i colori per i dipendenti dal file JSON
+            employee_colors = load_employee_colors()
+
+            for prenotazione in prenotazioni:
+                prenotazione_id = prenotazione[0]  # ID della prenotazione
+                ora_inizio = prenotazione[1]
+                minuto_inizio = prenotazione[2]
+                ora_fine = prenotazione[3]
+                minuto_fine = prenotazione[4]
+                dipendente = prenotazione[5]
+                cliente = prenotazione[6]
+                descrizione = prenotazione[7]
+
+                # Calcola l'ora di inizio e fine effettiva per garantire che sia un multiplo di 30 minuti
+                start_hour = ora_inizio
+                start_minute = minuto_inizio
+                end_hour = ora_fine
+                end_minute = minuto_fine
+
+                # Arrotonda l'ora di inizio verso il basso al multiplo di 30 minuti più vicino
+                if start_minute < 30:
+                    start_minute = 0
+                else:
+                    start_minute = 30
+
+                # Arrotonda l'ora di fine verso l'alto al multiplo di 30 minuti più vicino
+                if end_minute > 30:
+                    end_minute = 0
+                    end_hour += 1
+                elif end_minute != 0:
+                    end_minute = 30
+
+                # Itera su tutti gli intervalli di 30 minuti all'interno della prenotazione
+                current_hour = start_hour
+                current_minute = start_minute
+                while current_hour < end_hour or (current_hour == end_hour and current_minute <= end_minute):
+                    ora_str = f"{str(current_hour).zfill(2)}:{str(current_minute).zfill(2)}"
 
                     if ora_str not in daily_schedule:
                         daily_schedule[ora_str] = {}
@@ -407,38 +515,52 @@ def get_weekly_schedule():
 
                     daily_schedule[ora_str][dipendente].append({'id': prenotazione_id, 'cliente': cliente.lower(), 'descrizione': descrizione.lower()})
 
+                    # Incrementa di 30 minuti
+                    if current_minute == 0:
+                        current_minute = 30
+                    else:
+                        current_minute = 0
+                        current_hour += 1
+
             html_table = '<table border="1"><tr><th>Ora</th>'
-            if current_sede.lower() == 'aversa':
-                for dipendente in leggi_dipendenti_aversa():
-                    html_table += f'<th>{dipendente}</th>'
-            else:
-                for dipendente in leggi_dipendenti():
-                    html_table += f'<th>{dipendente}</th>'
+            for dipendente in employees:
+                # Usa i colori caricati dal file JSON per i dipendenti
+                employee_color = employee_colors.get(dipendente, '#FFFFFF')  # Default to white if color not found
+                html_table += f'<th style="background-color: {employee_color}">{dipendente}</th>'
             html_table += '</tr>'
 
-            for ora in range(7, 23):
-                ora_str = str(ora).zfill(2)
-                html_table += f'<tr><td>{ora_str}:00</td>'
-                if current_sede.lower() == 'aversa':
-                    for dipendente in leggi_dipendenti_aversa():
-                        prenotazioni = daily_schedule.get(ora_str, {}).get(dipendente, [])
-                        cell_content = ''
-                        for prenotazione in prenotazioni:
-                            prenotazione_id = prenotazione['id']
-                            cliente = prenotazione['cliente']
-                            descrizione = prenotazione['descrizione']
-                            cell_content += f'{cliente}<br><span style="font-size: 12px;">{descrizione}</span><br>'
-                        html_table += f'<td>{cell_content}</td>'
+            # Genera le righe per ogni intervallo di 30 minuti
+            current_hour = 8
+            current_minute = 0
+            while current_hour < 21 or (current_hour == 21 and current_minute == 0):
+                ora_str = f"{str(current_hour).zfill(2)}:{str(current_minute).zfill(2)}"
+                html_table += f'<tr><td>{ora_str}</td>'
+                for dipendente in employees:
+                    prenotazioni = daily_schedule.get(ora_str, {}).get(dipendente, [])
+                    cell_content = ''
+                    for prenotazione in prenotazioni:
+                        prenotazione_id = prenotazione['id']
+                        cliente = prenotazione['cliente']
+                        descrizione = prenotazione['descrizione']
+                        # Usa i colori caricati dal file JSON per le celle delle prenotazioni
+                        employee_color = employee_colors.get(dipendente, '#FFFFFF')  # Default to white if color not found
+                        cell_content += f'<div style="background-color: {employee_color};">'
+                        cell_content += f'{cliente}<br><span style="font-size: 12px;">{descrizione}</span><br>'
+                        cell_content += f'<span style="cursor: pointer;" onclick="eliminaPrenotazione({prenotazione_id}, \'{cliente}\', \'{descrizione}\')"> 🗑 </span>'
+                        cell_content += f'<span style="cursor: pointer;" onclick="modificaPrenotazione({prenotazione_id})"> 📝 </span>'
+                        cell_content += f'<span style="cursor: pointer;" onclick="modificaPrenotazione_ora({prenotazione_id})"> 🕒 </span><br>'
+                        cell_content += '</div>'
+
+                    html_table += f'<td>{cell_content}</td>'
+                html_table += '</tr>'
+
+                # Incrementa di 30 minuti
+                if current_minute == 0:
+                    current_minute = 30
                 else:
-                    for dipendente in leggi_dipendenti():
-                        prenotazioni = daily_schedule.get(ora_str, {}).get(dipendente, [])
-                        cell_content = ''
-                        for prenotazione in prenotazioni:
-                            prenotazione_id = prenotazione['id']
-                            cliente = prenotazione['cliente']
-                            descrizione = prenotazione['descrizione']
-                            cell_content += f'{cliente}<br><span style="font-size: 12px;">{descrizione}</span><br>'
-                        html_table += f'<td>{cell_content}</td>'
+                    current_minute = 0
+                    current_hour += 1
+
             return html_table
         except Exception as e:
             # Gestisci l'errore di disconnessione riconnettendoti al server MySQL e riprova l'operazione
@@ -448,7 +570,7 @@ def get_weekly_schedule():
                 return jsonify({'success': False, 'error': str(e)})
             else:
                 # Riconnessione al database
-                conn = create_connection()  # Sostituisci con la funzione appropriata per ottenere una nuova connessione al database
+                conn = create_connection()
                 cursor = conn.cursor()
 
 #---------------------------------------------------------------------------------------------------------------------#
