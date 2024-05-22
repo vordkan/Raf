@@ -131,6 +131,8 @@ def reset_contatori_mensili():
         contatori['conta_aversa'] = 0
         scrivi_contatori(contatori)
 #---------------------------------------------------------------------------------------------------------------------#
+from datetime import datetime
+
 @app.route('/submit', methods=['POST'])
 def submit():
     try:
@@ -188,7 +190,6 @@ def submit():
     except Exception as e:
         print(f"Si è verificato un errore durante il salvataggio della prenotazione nel database: {e}")
         return jsonify({'success': False, 'error': str(e)})
-
 
 import json
 
@@ -1032,7 +1033,6 @@ def aggiungi_spese():
                 conn.close()
     return "Si è verificato un errore durante l'aggiunta della spesa."
 
-
 @app.route('/guadagno_tot')
 def guadagno_tot():
     attempts = 0
@@ -1049,6 +1049,10 @@ def guadagno_tot():
                 cursor.execute("SELECT SUM(prezzo) FROM spese WHERE data = %s", (data,))
                 tot_spese = cursor.fetchone()[0]
 
+                # Imposto tot_spese a 0 se è None
+                if tot_spese is None:
+                    tot_spese = 0
+
                 # Prendo il totale guadagnato in giornata
                 cursor.execute("SELECT SUM(prezzo) FROM prenotazione WHERE DATE(data_inizio) = %s", (data,))
                 tot_guadagno = cursor.fetchone()[0]
@@ -1064,6 +1068,7 @@ def guadagno_tot():
             if conn:
                 conn.close()
     return "Si è verificato un errore durante il calcolo della somma giornaliera delle spese."
+
 
 @app.route('/spese_giornata')
 def spese_giornata():
@@ -1132,54 +1137,6 @@ def carica_merce():
 
 from datetime import datetime
 import time
-
-@app.route('/scarica_merce', methods=['POST'])
-def scarica_merce():
-    attempts = 0
-    max_attempts = 3
-    wait_time_seconds = 5
-
-    while attempts < max_attempts:
-        try:
-            conn = create_connection()
-            if conn:
-                cursor = conn.cursor()
-
-                id_merce = request.form['id_merceS']
-                quantita_scarico = int(request.form['quantita_scarico'])
-
-                data_scarico = datetime.utcnow()
-                data_scarico_str = data_scarico.strftime('%Y-%m-%d %H:%M:%S')
-
-                # Verifica se la merce esiste
-                cursor.execute("SELECT quantita FROM merci WHERE ID = %s", (id_merce,))
-                result = cursor.fetchone()
-
-                if result:
-                    quantita_attuale = result[0]
-                    if quantita_scarico <= quantita_attuale:
-                        # Aggiorna la quantità di merce nel database
-                        nuova_quantita = quantita_attuale - quantita_scarico
-                        cursor.execute("UPDATE merci SET quantita = %s, data_carico = %s WHERE ID = %s", (nuova_quantita, data_scarico_str, id_merce))
-                        conn.commit()
-                        # Restituisci un messaggio di successo senza visualizzare una schermata
-                        return jsonify({"success": True, "message": "Scarico avvenuto con successo!"}), 200
-                    else:
-                        return jsonify({"error": "Quantità da scaricare superiore alla quantità attuale."}), 400
-                else:
-                    return jsonify({"error": "Merce non trovata."}), 404
-        except Exception as e:
-            print(f"Tentativo di connessione fallito. Riprovo tra {wait_time_seconds} secondi...")
-            print(f"Errore: {e}")
-            time.sleep(wait_time_seconds)
-            attempts += 1
-        finally:
-            if conn:
-                conn.close()
-
-    print(f"Numero massimo di tentativi raggiunto ({max_attempts}). Impossibile stabilire la connessione al database.")
-    return jsonify({"error": "Impossibile stabilire la connessione al database."}), 500
-
 
 @app.route('/visualizza_merce', methods=['GET'])
 def visualizza_merce():
