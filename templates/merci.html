@@ -16,9 +16,7 @@
         <div class="tab">
             <button class="tablinks active" onclick="openTab(event, 'aggiungiMerce')">Aggiungi Merce</button>
         </div>
-        <div class="tab">
-            <button class="tablinks" onclick="openTab(event, 'eliminaMerce')">Scarica Merce</button>
-        </div>
+
         <div class="tab">
             <button class="tablinks" onclick="openTab(event, 'visualizzaMerce')">Visualizza Merce</button>
         </div>
@@ -222,9 +220,9 @@
                     <!-- <td>${merce[4]}</td> -->
                     <td>${dataCarico}</td>
                     <td>
-                        <button onclick="eliminaMerce('${merce[0]}')">🗑</button>
                         <button onclick="aggiungi('${merce[0]}')">➕</button>
                         <button onclick="rimuovi('${merce[0]}')">➖</button>
+                        <button onclick="eliminaMerce('${merce[0]}')">🗑</button>
                     </td>
                 `;
                     tableBody.appendChild(row);

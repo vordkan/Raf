@@ -47,16 +47,65 @@ def index():
     reset_contatori_mensili()
     return render_template('login.html')
 
-# Pagina login
+
+from werkzeug.security import generate_password_hash
+def register():
+    username = "admin"
+    password = "admin"
+
+    # Hash della password
+    hashed_password = generate_password_hash(password)
+
+    # Salva l'utente nel database
+    conn = create_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute('''INSERT INTO utente (nome, password) VALUES (%s, %s)''', (username, hashed_password))
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        print(f"Errore durante la registrazione: {e}")
+        return jsonify({'success': False, 'error': str(e)})
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+    return jsonify({'success': True, 'message': 'Utente registrato con successo'})
+
+
+from werkzeug.security import check_password_hash
+
 @app.route('/login', methods=['POST'])
 def login():
+    #register()
     username = request.form['username']
     password = request.form['password']
 
-    if username == 'admin' and password == 'admin':
-        return render_template('index.html')
+    conn = create_connection()
+    cursor = conn.cursor()
 
-    return jsonify({"success": False, "message": "Credenziali non valide"})
+    try:
+        cursor.execute('''SELECT password FROM utente WHERE nome = %s''', (username,))
+        result = cursor.fetchone()
+
+        if result:
+            stored_password_hash = result[0]
+            if check_password_hash(stored_password_hash, password):
+                return render_template('index.html')
+            else:
+                return jsonify({"success": False, "message": "Credenziali non valide"})
+        else:
+            return jsonify({"success": False, "message": "Credenziali non valide"})
+    except Exception as e:
+        print(f"Si è verificato un errore durante il login: {e}")
+        return jsonify({'success': False, 'error': str(e)})
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 
 # Pagina delle prenotazioni
@@ -135,62 +184,55 @@ from datetime import datetime
 
 @app.route('/submit', methods=['POST'])
 def submit():
+    conn = None
+    cursor = None
+
     try:
         summary = request.form['summary'].lower()
         description = request.form['description'].lower()
         start_datetime = datetime.strptime(request.form['start_datetime'], "%Y-%m-%dT%H:%M")
         end_datetime = datetime.strptime(request.form['end_datetime'], "%Y-%m-%dT%H:%M")
         dipendente = request.form['dipendente']
+        prezzo = request.form['prezzo']
 
-        # Connessione al database e ottenimento del cursore
         conn = create_connection()
         cursor = conn.cursor()
 
-        # Loop fino a quando non si riesce a recuperare la sede del dipendente
         while True:
             try:
                 cursor.execute('''SELECT sede FROM dipendente WHERE nome = %s''', (dipendente,))
-                sede = cursor.fetchone()[0]
-                break
+                sede = cursor.fetchone()
+                if sede:
+                    sede = sede[0]
+                    break
+                else:
+                    raise ValueError(f"Dipendente {dipendente} non trovato.")
             except mysql.connector.Error as err:
                 if err.errno == mysql.connector.errorcode.CR_SERVER_GONE_ERROR:
-                    # Se c'è un errore di disconnessione, riconnetti il client
                     conn = create_connection()
                     cursor = conn.cursor()
                 else:
-                    # Gestisci altri errori sollevando l'eccezione
                     raise
 
-        prezzo = request.form['prezzo']
-
-        # Verifica se il cliente è nuovo
-        #cursor.execute('''SELECT * FROM prenotazione WHERE nome = %s AND sede = %s''', (summary, sede,))
-        #controllo = cursor.fetchone()
-        #print(controllo)
-
-        # Se restituisce None, incrementa la variabile corretta
-        #if controllo is None:
-
-        #    if sede == "Frattamaggiore":
-        #        incrementa_contatore_fratta()
-        #    if sede == "Aversa":
-        #        incrementa_contatore_aversa()
-
         # Inserimento dei dati nella tabella prenotazione
-        cursor.execute('''INSERT INTO prenotazione (nome, descrizione, dipendente, sede, data_inizio, data_fine, prezzo) VALUES (%s, %s, %s, %s, %s, %s, %s)''',
+        cursor.execute('''INSERT INTO prenotazione (nome, descrizione, dipendente, sede, data_inizio, data_fine, prezzo)
+                          VALUES (%s, %s, %s, %s, %s, %s, %s)''',
                        (summary, description, dipendente, sede, start_datetime, end_datetime, prezzo))
         conn.commit()
+
         print("Prenotazione salvata nel database 'raffaele'")
+        return jsonify({'success': True})
 
-        # Chiusura della connessione e del cursore
-        cursor.close()
-        conn.close()
-
-        return jsonify({'success': True})  # Risposta JSON per indicare il successo
     except Exception as e:
+        if conn:
+            conn.rollback()
         print(f"Si è verificato un errore durante il salvataggio della prenotazione nel database: {e}")
         return jsonify({'success': False, 'error': str(e)})
-
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 import json
 
 def load_employee_colors():
@@ -568,7 +610,7 @@ def get_weekly_schedule(max_attempts=3):
             print(f"Si è verificato un errore durante l'accesso al database: {e}")
             attempts += 1
             if attempts >= max_attempts:
-                return jsonify({'success': False, 'error': str(e)})
+                return jsonify("Inserire Data e Sede")
             else:
                 # Riconnessione al database
                 conn = create_connection()
@@ -963,8 +1005,11 @@ def get_schedule():
             conn = create_connection()
             if conn:
                 cursor = conn.cursor()
-                period = request.args.get('period')  # period può essere 'daily', 'monthly', 'annual'
-                print(f"Periodo richiesto: {period}")
+                period = request.args.get('period')  # period può essere 'giornaliero', 'mensile', 'annuale'
+                selected_month = request.args.get('month')  # Ottieni il mese selezionato dall'utente
+                selected_year = datetime.now().year
+
+                print(f"Periodo richiesto: {period}, Mese: {selected_month}")
                 schedule = {}
                 current_date = datetime.now().date()
 
@@ -977,7 +1022,7 @@ def get_schedule():
                     if period == 'giornaliero':
                         cursor.execute("SELECT SUM(prezzo) FROM prenotazione WHERE DATE(data_inizio) = %s AND dipendente = %s", (current_date, dipendente_id))
                     elif period == 'mensile':
-                        cursor.execute("SELECT SUM(prezzo) FROM prenotazione WHERE YEAR(data_inizio) = YEAR(CURDATE()) AND MONTH(data_inizio) = MONTH(CURDATE()) AND dipendente = %s", (dipendente_id,))
+                        cursor.execute("SELECT SUM(prezzo) FROM prenotazione WHERE YEAR(data_inizio) = %s AND MONTH(data_inizio) = %s AND dipendente = %s", (selected_year, selected_month, dipendente_id))
                     elif period == 'annuale':
                         selected_year = request.args.get('anno')  # Ottieni l'anno selezionato dall'utente
                         if not selected_year:  # Se il parametro anno è vuoto, usa l'anno attuale
@@ -1004,6 +1049,7 @@ def get_schedule():
 
     print(f"Numero massimo di tentativi raggiunto ({max_attempts}). Impossibile stabilire la connessione al database.")
     return jsonify({'error': 'Impossibile stabilire la connessione al database.'}), 500
+
 #---------------------------------------------------------------------------------------------------------------------#
 @app.route('/aggiungi_spesa', methods=['POST'])
 def aggiungi_spese():
@@ -1272,3 +1318,4 @@ def rimuovi():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
